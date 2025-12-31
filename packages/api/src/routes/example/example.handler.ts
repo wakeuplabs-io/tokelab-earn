@@ -6,18 +6,17 @@
  */
 
 import * as HttpStatusCodes from "stoker/http-status-codes";
-import { AppRouteHandler } from "../../lib/types";
-import { ExampleRoute } from "./example.routes";
+import type { Context } from "hono";
+import type { AppBindings } from "../../lib/types";
 
 /**
  * Example endpoint handler
- * @type {AppRouteHandler<ExampleRoute>}
  * @description Handles GET requests to the /example endpoint
  *
- * @param {import('hono').Context} c - The Hono context object
+ * @param {Context<AppBindings>} c - The Hono context object
  * @returns {Promise<Response>} JSON response with example message
  */
-export const exampleHandler: AppRouteHandler<ExampleRoute> = async (c) => {
+export const exampleHandler = async (c: Context<AppBindings>) => {
   return c.json(
     {
       message: "Api Hono Example route",

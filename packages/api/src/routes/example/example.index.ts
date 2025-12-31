@@ -7,13 +7,12 @@
 
 import { createRouter } from "../../lib/create-app";
 import * as handler from "./example.handler";
-import * as routes from "./example.routes";
 
 /**
  * Configured example router
  * @description Combines the example route definition with its handler
- * @type {import('../../lib/types').AppOpenAPI}
+ * @type {import('../../lib/types').AppType}
  */
-const router = createRouter().openapi(routes.exampleRoute, handler.exampleHandler);
+const router = createRouter().get("/example", handler.exampleHandler);
 
 export default router;
