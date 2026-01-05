@@ -1,0 +1,54 @@
+// Prisma schema for Web3 Custody Platform
+// Uses NeonDB serverless PostgreSQL with connection pooling
+
+generator client {
+  provider = "prisma-client-js"
+  previewFeatures = ["postgresqlExtensions"]
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL") // For migrations, uses direct connection
+  extensions = [pg_trgm, uuid_ossp]
+}
+
+// User represents an end-user of the platform
+model User {
+  id        String   @id @default(uuid()) @db.Uuid
+  email     String   @unique @db.VarChar(255)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  vault     Vault?
+
+  @@index([email])
+  @@map("users")
+}
+
+// Vault: 1:1 relationship with Fireblocks Vault Account
+// Each user has exactly one vault for complete segregation
+model Vault {
+  id                String   @id @default(uuid()) @db.Uuid
+  userId            String   @unique @db.Uuid
+  fireblocksVaultId String   @unique @db.VarChar(255) // Fireblocks vault account ID
+  name              String   @db.VarChar(255) // Human-readable name
+  status            VaultStatus @default(ACTIVE)
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  // Relations
+  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([fireblocksVaultId])
+  @@index([userId])
+  @@map("vaults")
+}
+
+enum VaultStatus {
+  CREATING
+  ACTIVE
+  SUSPENDED
+  CLOSED
+}

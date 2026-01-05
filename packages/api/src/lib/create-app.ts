@@ -9,8 +9,9 @@
 import type { Schema } from "hono";
 import { Hono } from "hono";
 import { requestId } from "hono/request-id";
-import { notFound, onError, serveEmojiFavicon } from "stoker/middlewares";
+import { notFound, serveEmojiFavicon } from "stoker/middlewares";
 import { pinoLogger } from "../middlewares/pino-logger";
+import { errorHandler } from "../middlewares/error-handler";
 
 import type { AppBindings, AppType } from "./types";
 
@@ -41,7 +42,7 @@ export default function createApp() {
   app.use(requestId()).use(serveEmojiFavicon("📝")).use(pinoLogger());
 
   app.notFound(notFound);
-  app.onError(onError);
+  app.onError(errorHandler);
   return app;
 }
 
