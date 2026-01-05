@@ -7,7 +7,9 @@
     "dev": "vite",
     "build": "npm install && npx tsc && vite build",
     "preview": "vite preview",
-    "routes": "@tanstack/router-vite-plugin generate"
+    "routes": "@tanstack/router-vite-plugin generate",
+    "lint": "eslint src/**/*.ts",
+    "lint:fix": "eslint src/**/*.ts --fix"
   },
   "dependencies": {
     "@tailwindcss/vite": "4.1.18",
