@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as VaultIndexRouteImport } from './routes/vault/index'
+import { Route as AdminIndexRouteImport } from './routes/admin/index'
 import { Route as AboutIndexRouteImport } from './routes/about/index'
 
 const IndexRoute = IndexRouteImport.update({
@@ -23,6 +24,11 @@ const VaultIndexRoute = VaultIndexRouteImport.update({
   path: '/vault/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminIndexRoute = AdminIndexRouteImport.update({
+  id: '/admin/',
+  path: '/admin/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AboutIndexRoute = AboutIndexRouteImport.update({
   id: '/about/',
   path: '/about/',
@@ -32,30 +38,34 @@ const AboutIndexRoute = AboutIndexRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutIndexRoute
+  '/admin': typeof AdminIndexRoute
   '/vault': typeof VaultIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutIndexRoute
+  '/admin': typeof AdminIndexRoute
   '/vault': typeof VaultIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/about/': typeof AboutIndexRoute
+  '/admin/': typeof AdminIndexRoute
   '/vault/': typeof VaultIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/about' | '/vault'
+  fullPaths: '/' | '/about' | '/admin' | '/vault'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/about' | '/vault'
-  id: '__root__' | '/' | '/about/' | '/vault/'
+  to: '/' | '/about' | '/admin' | '/vault'
+  id: '__root__' | '/' | '/about/' | '/admin/' | '/vault/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AboutIndexRoute: typeof AboutIndexRoute
+  AdminIndexRoute: typeof AdminIndexRoute
   VaultIndexRoute: typeof VaultIndexRoute
 }
 
@@ -75,6 +85,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof VaultIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/': {
+      id: '/admin/'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AdminIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/about/': {
       id: '/about/'
       path: '/about'
@@ -88,6 +105,7 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutIndexRoute: AboutIndexRoute,
+  AdminIndexRoute: AdminIndexRoute,
   VaultIndexRoute: VaultIndexRoute,
 }
 export const routeTree = rootRouteImport

@@ -13,4 +13,3 @@ export interface User {
 export interface CreateUserParams {
   email: string;
 }
-

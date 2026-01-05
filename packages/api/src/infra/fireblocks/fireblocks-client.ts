@@ -1,7 +1,7 @@
 /**
  * Fireblocks SDK wrapper
  * Provides a clean interface for all Fireblocks operations
- * 
+ *
  * Architecture: This is infrastructure layer - never accessed directly from controllers
  * All Fireblocks interactions go through this adapter
  */
@@ -104,7 +104,11 @@ export class FireblocksClient {
    */
   async createVaultAccount(params: CreateVaultAccountParams): Promise<CreateVaultAccountResult> {
     try {
-      const vaultAccount = await this.sdk.createVaultAccount(params.name, params.hiddenOnUI ?? false, params.customerRefId);
+      const vaultAccount = await this.sdk.createVaultAccount(
+        params.name,
+        params.hiddenOnUI ?? false,
+        params.customerRefId,
+      );
 
       return {
         id: vaultAccount.id,
@@ -113,7 +117,7 @@ export class FireblocksClient {
     } catch (error) {
       throw new FireblocksError(
         `Failed to create vault account: ${error instanceof Error ? error.message : String(error)}`,
-        error
+        error,
       );
     }
   }
@@ -127,7 +131,7 @@ export class FireblocksClient {
     } catch (error) {
       throw new FireblocksError(
         `Failed to get vault account ${vaultAccountId}: ${error instanceof Error ? error.message : String(error)}`,
-        error
+        error,
       );
     }
   }
@@ -137,13 +141,13 @@ export class FireblocksClient {
    * Supports multiple addresses per asset (for privacy)
    */
   async createDepositAddress(
-    params: CreateDepositAddressParams
+    params: CreateDepositAddressParams,
   ): Promise<CreateDepositAddressResult> {
     try {
       const address = await this.sdk.generateNewAddress(
         params.vaultAccountId,
         params.assetId,
-        params.description
+        params.description,
       );
 
       return {
@@ -154,7 +158,7 @@ export class FireblocksClient {
     } catch (error) {
       throw new FireblocksError(
         `Failed to create deposit address for vault ${params.vaultAccountId}, asset ${params.assetId}: ${error instanceof Error ? error.message : String(error)}`,
-        error
+        error,
       );
     }
   }
@@ -185,7 +189,7 @@ export class FireblocksClient {
     } catch (error) {
       throw new FireblocksError(
         `Failed to create withdrawal: ${error instanceof Error ? error.message : String(error)}`,
-        error
+        error,
       );
     }
   }
@@ -196,7 +200,7 @@ export class FireblocksClient {
   async getTransaction(txId: string): Promise<FireblocksTransaction> {
     try {
       const tx = await this.sdk.getTransactionById(txId);
-      
+
       return {
         id: tx.id,
         assetId: tx.assetId,
@@ -213,7 +217,7 @@ export class FireblocksClient {
     } catch (error) {
       throw new FireblocksError(
         `Failed to get transaction ${txId}: ${error instanceof Error ? error.message : String(error)}`,
-        error
+        error,
       );
     }
   }
@@ -229,7 +233,7 @@ export class FireblocksClient {
     } catch (error) {
       throw new FireblocksError(
         `Failed to get balance for vault ${vaultAccountId}, asset ${assetId}: ${error instanceof Error ? error.message : String(error)}`,
-        error
+        error,
       );
     }
   }
@@ -239,7 +243,10 @@ export class FireblocksClient {
  * Custom error for Fireblocks operations
  */
 export class FireblocksError extends Error {
-  constructor(message: string, public readonly cause?: unknown) {
+  constructor(
+    message: string,
+    public readonly cause?: unknown,
+  ) {
     super(message);
     this.name = "FireblocksError";
   }
@@ -256,4 +263,3 @@ export function getFireblocksClient(): FireblocksClient {
 }
 
 export default getFireblocksClient();
-

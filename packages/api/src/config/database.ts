@@ -16,7 +16,7 @@ let prisma: PrismaClient;
 export function getPrismaClient(): PrismaClient {
   if (!prisma) {
     const connectionString = process.env.DATABASE_URL;
-    
+
     if (!connectionString) {
       throw new Error("DATABASE_URL environment variable is required");
     }
@@ -31,9 +31,7 @@ export function getPrismaClient(): PrismaClient {
 
     prisma = new PrismaClient({
       adapter,
-      log: process.env.NODE_ENV === "development" 
-        ? ["query", "error", "warn"] 
-        : ["error"],
+      log: process.env.NODE_ENV === "development" ? ["query", "error", "warn"] : ["error"],
     });
   }
 
@@ -52,4 +50,3 @@ export async function disconnectPrisma(): Promise<void> {
 
 // Export singleton instance
 export default getPrismaClient();
-

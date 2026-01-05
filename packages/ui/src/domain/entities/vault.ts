@@ -16,4 +16,3 @@ export interface CreateVaultRequest {
   name?: string;
   customerRefId?: string;
 }
-

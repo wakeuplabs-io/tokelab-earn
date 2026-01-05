@@ -19,4 +19,3 @@ export const healthService = {
     return apiGet<HealthResponse>("/health");
   },
 };
-

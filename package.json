@@ -5,7 +5,8 @@
   "scripts": {
     "build": "npm run build --workspaces --if-present",
     "dev": "concurrently --kill-others \"npm -w api run dev\" \"npm -w ui run dev\"",
-    "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
+    "lint": "eslint . --max-warnings 0",
+    "lint:fix": "eslint . --max-warnings 0 --fix",
     "format": "prettier --write \"**/*.{js,jsx,ts,tsx,json,css,scss,md}\"",
     "format:check": "prettier --check \"**/*.{js,jsx,ts,tsx,json,css,scss,md}\"",
     "deploy:app:staging": "sst install && sst deploy --stage=staging --print-logs",
@@ -28,11 +29,13 @@
     "eslint-plugin-react": "7.37.5",
     "eslint-plugin-react-hooks": "7.0.1",
     "eslint-plugin-react-refresh": "0.4.26",
+    "globals": "^17.0.0",
     "prettier": "3.7.4",
     "serverless": "4.29.3",
     "serverless-plugin-common-excludes": "4.0.0",
     "serverless-plugin-include-dependencies": "6.1.1",
-    "serverless-s3-sync": "3.5.0"
+    "serverless-s3-sync": "3.5.0",
+    "typescript-eslint": "^8.52.0"
   },
   "dependencies": {
     "@aws-sdk/client-ec2": "3.958.0",

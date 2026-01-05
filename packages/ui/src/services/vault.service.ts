@@ -18,10 +18,7 @@ export const vaultService = {
   /**
    * Create a new vault for the authenticated user
    */
-  async create(
-    data: CreateVaultRequest,
-    token: string
-  ): Promise<CreateVaultResponse> {
+  async create(data: CreateVaultRequest, token: string): Promise<CreateVaultResponse> {
     return apiPost<CreateVaultResponse>("/api/vault", data, token);
   },
 

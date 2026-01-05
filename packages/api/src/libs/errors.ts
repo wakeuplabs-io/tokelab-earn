@@ -7,7 +7,7 @@ export class DomainError extends Error {
   constructor(
     message: string,
     public readonly code: string,
-    public readonly statusCode: number = 500
+    public readonly statusCode: number = 500,
   ) {
     super(message);
     this.name = this.constructor.name;
@@ -16,16 +16,15 @@ export class DomainError extends Error {
 
 export class NotFoundError extends DomainError {
   constructor(resource: string, id?: string) {
-    super(
-      id ? `${resource} with id ${id} not found` : `${resource} not found`,
-      "NOT_FOUND",
-      404
-    );
+    super(id ? `${resource} with id ${id} not found` : `${resource} not found`, "NOT_FOUND", 404);
   }
 }
 
 export class ValidationError extends DomainError {
-  constructor(message: string, public readonly fields?: Record<string, string[]>) {
+  constructor(
+    message: string,
+    public readonly fields?: Record<string, string[]>,
+  ) {
     super(message, "VALIDATION_ERROR", 400);
   }
 }
@@ -53,8 +52,7 @@ export class InsufficientBalanceError extends DomainError {
     super(
       `Insufficient balance for ${assetId}. Available: ${available}, Requested: ${requested}`,
       "INSUFFICIENT_BALANCE",
-      400
+      400,
     );
   }
 }
-

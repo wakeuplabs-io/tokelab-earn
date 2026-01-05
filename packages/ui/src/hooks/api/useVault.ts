@@ -27,7 +27,7 @@ export function useVault() {
       return result?.vault ?? null;
     },
     enabled: isAuthenticated,
-    retry: false, // Don't retry on 404
+    retry: false, // Don't retry on 404,
   });
 }
 
@@ -49,4 +49,3 @@ export function useCreateVault() {
     },
   });
 }
-

@@ -16,7 +16,7 @@ export interface ApiError {
  */
 export async function apiRequest<T>(
   endpoint: string,
-  options: RequestInit & { token?: string } = {}
+  options: RequestInit & { token?: string } = {},
 ): Promise<T> {
   const { token, ...fetchOptions } = options;
   const url = `${config.API_URL}${endpoint}`;
@@ -60,11 +60,7 @@ export async function apiGet<T>(endpoint: string, token?: string): Promise<T> {
 /**
  * POST request
  */
-export async function apiPost<T>(
-  endpoint: string,
-  data?: unknown,
-  token?: string
-): Promise<T> {
+export async function apiPost<T>(endpoint: string, data?: unknown, token?: string): Promise<T> {
   return apiRequest<T>(endpoint, {
     method: "POST",
     body: data ? JSON.stringify(data) : undefined,
@@ -75,11 +71,7 @@ export async function apiPost<T>(
 /**
  * PUT request
  */
-export async function apiPut<T>(
-  endpoint: string,
-  data?: unknown,
-  token?: string
-): Promise<T> {
+export async function apiPut<T>(endpoint: string, data?: unknown, token?: string): Promise<T> {
   return apiRequest<T>(endpoint, {
     method: "PUT",
     body: data ? JSON.stringify(data) : undefined,

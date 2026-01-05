@@ -12,4 +12,3 @@ export const auth0Config = {
     audience: config.AUTH0_AUDIENCE,
   },
 };
-

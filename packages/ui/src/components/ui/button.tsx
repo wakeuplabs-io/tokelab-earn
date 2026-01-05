@@ -11,7 +11,10 @@ export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 }
 
 export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
-  ({ className = "", variant = "primary", size = "md", isLoading, children, disabled, ...props }, ref) => {
+  (
+    { className = "", variant = "primary", size = "md", isLoading, children, disabled, ...props },
+    ref,
+  ) => {
     const baseClasses = "btn";
     const variantClasses = {
       primary: "btn-primary",
@@ -42,8 +45,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
         )}
       </button>
     );
-  }
+  },
 );
 
 Button.displayName = "Button";
-

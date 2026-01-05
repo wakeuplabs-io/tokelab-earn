@@ -28,23 +28,15 @@ export interface FireblocksWebhookPayload {
  * @param signature - X-Fireblocks-Signature header value
  * @returns true if signature is valid
  */
-export function verifyFireblocksWebhook(
-  payload: string,
-  signature: string
-): boolean {
+export function verifyFireblocksWebhook(payload: string, signature: string): boolean {
   const env = getEnv();
   const secret = env.FIREBLOCKS_WEBHOOK_SECRET;
 
   // Fireblocks uses HMAC-SHA256
-  const expectedSignature = createHmac("sha256", secret)
-    .update(payload)
-    .digest("hex");
+  const expectedSignature = createHmac("sha256", secret).update(payload).digest("hex");
 
   // Use constant-time comparison to prevent timing attacks
-  return timingSafeEqual(
-    Buffer.from(signature, "hex"),
-    Buffer.from(expectedSignature, "hex")
-  );
+  return timingSafeEqual(Buffer.from(signature, "hex"), Buffer.from(expectedSignature, "hex"));
 }
 
 /**
@@ -71,7 +63,8 @@ export function parseWebhookPayload(payload: string): FireblocksWebhookPayload {
   try {
     return JSON.parse(payload) as FireblocksWebhookPayload;
   } catch (error) {
-    throw new Error(`Invalid webhook payload: ${error instanceof Error ? error.message : String(error)}`);
+    throw new Error(
+      `Invalid webhook payload: ${error instanceof Error ? error.message : String(error)}`,
+    );
   }
 }
-

@@ -21,4 +21,3 @@ export interface CreateVaultParams {
   name?: string; // Optional, will be generated if not provided
   customerRefId?: string; // For idempotency tracking
 }
-

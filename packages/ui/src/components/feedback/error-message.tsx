@@ -29,4 +29,3 @@ export function ErrorMessage({ error, onRetry }: { error: Error | string; onRetr
     </div>
   );
 }
-

@@ -1,7 +1,7 @@
 /**
  * @fileoverview Main configuration for the Hono API application
  * Web3 Custody Platform API with Fireblocks integration
- * 
+ *
  * Architecture:
  * - Segregated vaults (one per user)
  * - Ledger-based accounting
@@ -37,10 +37,10 @@ app.use(
 
 /**
  * API Routes
- * 
+ *
  * User endpoints (require authentication):
  * POST   /api/vault        - Create user vault
- * 
+ *
  * Webhooks (no auth, signature verified):
  * POST   /api/webhooks/fireblocks - Fireblocks webhook handler
  */

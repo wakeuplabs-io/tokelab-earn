@@ -4,7 +4,11 @@
  */
 
 import { Context } from "hono";
-import { verifyFireblocksWebhook, parseWebhookPayload, type FireblocksWebhookPayload } from "../fireblocks/webhook-verifier";
+import {
+  verifyFireblocksWebhook,
+  parseWebhookPayload,
+  type FireblocksWebhookPayload,
+} from "../fireblocks/webhook-verifier";
 
 /**
  * Handle Fireblocks webhook
@@ -19,7 +23,7 @@ export async function handleFireblocksWebhook(c: Context) {
     }
 
     const rawBody = await c.req.text();
-    
+
     if (!verifyFireblocksWebhook(rawBody, signature)) {
       return c.json({ error: "Invalid signature" }, 401);
     }
@@ -33,12 +37,12 @@ export async function handleFireblocksWebhook(c: Context) {
         // TODO: Handle transaction status changes
         console.log("Transaction status changed:", payload.data);
         break;
-      
+
       case "VAULT_ACCOUNT_ADDED":
         // TODO: Handle new vault account
         console.log("Vault account added:", payload.data);
         break;
-      
+
       default:
         console.log(`Unhandled webhook type: ${payload.type}`);
     }
@@ -49,4 +53,3 @@ export async function handleFireblocksWebhook(c: Context) {
     return c.json({ error: "Internal server error" }, 500);
   }
 }
-

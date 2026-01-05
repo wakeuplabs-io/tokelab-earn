@@ -14,4 +14,3 @@ router.use("/*", authMiddleware);
 router.post("/", createVaultHandler);
 
 export default router;
-

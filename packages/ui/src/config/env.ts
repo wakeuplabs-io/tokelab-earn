@@ -8,7 +8,7 @@ import { z } from "zod";
 const envSchema = z.object({
   // API
   VITE_API_URL: z.string().url().default("http://localhost:3001"),
-  
+
   // Auth0
   VITE_AUTH0_DOMAIN: z.string().min(1),
   VITE_AUTH0_CLIENT_ID: z.string().min(1),
@@ -44,4 +44,3 @@ export const config = {
 
 // Export default for backward compatibility
 export default config;
-

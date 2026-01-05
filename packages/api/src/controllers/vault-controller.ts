@@ -27,7 +27,7 @@ const createVaultSchema = z.object({
 export async function createVaultHandler(c: Context) {
   // Get user ID from auth context (set by auth middleware)
   const userId = c.get("userId") as string;
-  
+
   if (!userId) {
     throw new UnauthorizedError("User ID not found in token");
   }
@@ -47,17 +47,20 @@ export async function createVaultHandler(c: Context) {
     },
     {
       vaultRepository,
-     // fireblocksClient,
-    }
+      // fireblocksClient,
+    },
   );
 
-  return c.json({
-    vault: {
-      id: result.vault.id,
-      fireblocksVaultId: result.vault.fireblocksVaultId,
-      name: result.vault.name,
-      status: result.vault.status,
-      createdAt: result.vault.createdAt.toISOString(),
+  return c.json(
+    {
+      vault: {
+        id: result.vault.id,
+        fireblocksVaultId: result.vault.fireblocksVaultId,
+        name: result.vault.name,
+        status: result.vault.status,
+        createdAt: result.vault.createdAt.toISOString(),
+      },
     },
-  }, 201);
+    201,
+  );
 }

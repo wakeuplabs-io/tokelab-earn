@@ -82,13 +82,10 @@ export function VaultPage() {
             >
               Create Vault
             </Button>
-            {createVault.isError && (
-              <ErrorMessage error={createVault.error as Error} />
-            )}
+            {createVault.isError && <ErrorMessage error={createVault.error as Error} />}
           </div>
         </CardBody>
       </Card>
     </div>
   );
 }
-

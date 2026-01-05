@@ -1,7 +1,7 @@
 /**
  * Error Handler Middleware
  * Centralized error handling for all routes
- * 
+ *
  * Handles:
  * - Domain errors (with status codes)
  * - Validation errors (Zod)
@@ -66,7 +66,7 @@ function handleError(c: Context, error: unknown): Response {
         code: "VALIDATION_ERROR",
         details: error.errors,
       },
-      400
+      400,
     );
   }
 
@@ -77,7 +77,7 @@ function handleError(c: Context, error: unknown): Response {
         error: "Invalid token",
         code: "INVALID_TOKEN",
       },
-      401
+      401,
     );
   }
 
@@ -87,7 +87,7 @@ function handleError(c: Context, error: unknown): Response {
         error: "Token expired",
         code: "TOKEN_EXPIRED",
       },
-      401
+      401,
     );
   }
 
@@ -99,7 +99,7 @@ function handleError(c: Context, error: unknown): Response {
         error: "Internal server error",
         code: "INTERNAL_ERROR",
       },
-      500
+      500,
     );
   }
 
@@ -110,7 +110,7 @@ function handleError(c: Context, error: unknown): Response {
       error: "Internal server error",
       code: "UNKNOWN_ERROR",
     },
-    500
+    500,
   );
 }
 
@@ -119,7 +119,7 @@ function handleError(c: Context, error: unknown): Response {
  * Wraps async route handlers to catch errors
  */
 export function asyncHandler(
-  handler: (c: Context) => Promise<Response>
+  handler: (c: Context) => Promise<Response>,
 ): (c: Context) => Promise<Response> {
   return async (c: Context) => {
     try {
@@ -129,4 +129,3 @@ export function asyncHandler(
     }
   };
 }
-

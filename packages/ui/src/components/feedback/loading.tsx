@@ -10,4 +10,3 @@ export function Loading({ message = "Loading..." }: { message?: string }) {
     </div>
   );
 }
-
