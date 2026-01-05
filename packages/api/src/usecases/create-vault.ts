@@ -32,7 +32,7 @@ export async function createVault(
   params: CreateVaultParams,
   deps: {
     vaultRepository: VaultRepository;
-    fireblocksClient: FireblocksClient;
+  //  fireblocksClient: FireblocksClient;
   }
 ): Promise<CreateVaultResult> {
   // Step 1: Check if user already has a vault (1:1 constraint)
@@ -50,13 +50,13 @@ export async function createVault(
   let fireblocksVaultName: string;
 
   try {
-    const fireblocksResult = await deps.fireblocksClient.createVaultAccount({
+   /*  const fireblocksResult = await deps.fireblocksClient.createVaultAccount({
       name: params.name || `User ${params.userId}`,
       customerRefId: params.customerRefId || params.userId, // Use userId as customer ref for tracking
     });
 
     fireblocksVaultId = fireblocksResult.id;
-    fireblocksVaultName = fireblocksResult.name;
+    fireblocksVaultName = fireblocksResult.name; */
   } catch (error) {
     // If Fireblocks fails, we don't have a vault to clean up
     throw new DomainError(
@@ -70,11 +70,11 @@ export async function createVault(
   let vault: Vault;
   
   try {
-    vault = await deps.vaultRepository.create({
+ /*    vault = await deps.vaultRepository.create({
       userId: params.userId,
       fireblocksVaultId,
       name: fireblocksVaultName,
-    });
+    }); */
   } catch (error) {
     // If database insert fails, we have an orphaned Fireblocks vault
     // In production, you might want to:
@@ -91,13 +91,13 @@ export async function createVault(
   // Step 4: Update vault status to ACTIVE
   // Initially created as CREATING, now mark as active
   try {
-    vault = await deps.vaultRepository.updateStatus(vault.id, "ACTIVE");
+   /*  vault = await deps.vaultRepository.updateStatus(vault.id, "ACTIVE"); */
   } catch (error) {
     // Non-critical - vault exists and is functional
     // Log error but don't fail the operation
     console.error(`Failed to update vault status to ACTIVE: ${error}`);
   }
 
-  return { vault };
+  return { vault: {} as Vault };
 }
 

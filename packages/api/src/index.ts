@@ -4,6 +4,7 @@ import { getEnv } from "./config/env";
 import app from "./app";
 
 const port = getEnv().PORT;
+console.log("PORT", port);
 
 // For AWS Lambda
 export const handler = handle(app);
