@@ -12,7 +12,7 @@ import { Context } from "hono";
 import { createVault } from "../usecases/create-vault";
 import { VaultRepository } from "../infra/db/repositories/vault-repository";
 //import { getFireblocksClient } from "../infra/fireblocks/fireblocks-client";
-import { UnauthorizedError } from "../libs/errors";
+import { UnauthorizedError } from "../lib/errors";
 import { z } from "zod";
 
 const createVaultSchema = z.object({

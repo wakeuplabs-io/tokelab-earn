@@ -13,7 +13,7 @@
 
 import { VaultRepository } from "../infra/db/repositories/vault-repository";
 //import { FireblocksClient } from "../infra/fireblocks/fireblocks-client";
-import { ConflictError, DomainError } from "../libs/errors";
+import { ConflictError, DomainError } from "../lib/errors";
 import type { CreateVaultParams, Vault } from "../domain/entities/vault";
 
 export interface CreateVaultResult {

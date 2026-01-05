@@ -12,7 +12,7 @@
 import { Context, Next } from "hono";
 import { ZodError } from "zod";
 import jwt from "jsonwebtoken";
-import { DomainError, ValidationError } from "../libs/errors";
+import { DomainError, ValidationError } from "../lib/errors";
 import { ContentfulStatusCode } from "hono/utils/http-status";
 
 export interface ErrorResponse {
