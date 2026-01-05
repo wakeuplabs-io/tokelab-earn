@@ -1,47 +1,42 @@
 /**
  * Vault Service
- * Type-safe API calls for vault operations using Hono RPC client
+ * API calls for vault operations using fetch
  */
 
-import { getApiClientWithToken } from "../lib/api-client";
+import { apiGet, apiPost } from "../lib/api-client";
 import type { CreateVaultRequest, Vault } from "../domain/entities/vault";
+
+export interface CreateVaultResponse {
+  vault: Vault;
+}
+
+export interface GetVaultResponse {
+  vault: Vault;
+}
 
 export const vaultService = {
   /**
    * Create a new vault for the authenticated user
    */
-  async create(data: CreateVaultRequest, getToken: () => Promise<string>): Promise<{ vault: Vault }> {
-    const client = await getApiClientWithToken(getToken);
-    const response = await client.api.vault.$post({
-      json: data,
-    });
-
-    if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error.error || "Failed to create vault");
-    }
-
-    return await response.json();
+  async create(
+    data: CreateVaultRequest,
+    token: string
+  ): Promise<CreateVaultResponse> {
+    return apiPost<CreateVaultResponse>("/api/vault", data, token);
   },
 
   /**
    * Get user's vault (if exists)
    * Note: This endpoint doesn't exist yet in the backend, but we can add it
    */
-  async get(getToken: () => Promise<string>): Promise<{ vault: Vault } | null> {
-    const client = await getApiClientWithToken(getToken);
-    const response = await client.api.vault.$get();
-
-    if (response.status === 404) {
-      return null;
+  async get(token: string): Promise<GetVaultResponse | null> {
+    try {
+      return await apiGet<GetVaultResponse>("/api/vault", token);
+    } catch (error) {
+      if (error instanceof Error && error.message.includes("404")) {
+        return null;
+      }
+      throw error;
     }
-
-    if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error.error || "Failed to get vault");
-    }
-
-    return await response.json();
   },
 };
-

@@ -22,7 +22,8 @@ export function useVault() {
     queryKey: QUERY_KEYS.vault,
     queryFn: async () => {
       if (!isAuthenticated) return null;
-      const result = await vaultService.get(getToken);
+      const token = await getToken();
+      const result = await vaultService.get(token);
       return result?.vault ?? null;
     },
     enabled: isAuthenticated,
@@ -38,7 +39,10 @@ export function useCreateVault() {
   const { getToken } = useAuth();
 
   return useMutation({
-    mutationFn: (data: CreateVaultRequest) => vaultService.create(data, getToken),
+    mutationFn: async (data: CreateVaultRequest) => {
+      const token = await getToken();
+      return vaultService.create(data, token);
+    },
     onSuccess: () => {
       // Invalidate and refetch vault query
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.vault });

@@ -3,9 +3,10 @@
  * Data access layer for User entities
  */
 
-import { PrismaClient } from "../../generated/prisma/client";
-import { User, CreateUserParams } from "../../domain/entities/user";
-import getPrismaClient from "../../config/database";
+import { PrismaClient } from "../../../generated/prisma/client";
+import { User, CreateUserParams } from "../../../domain/entities/user";
+import { getPrismaClient } from "src/config/database";
+
 
 export class UserRepository {
   constructor(private readonly prisma: PrismaClient = getPrismaClient()) {}

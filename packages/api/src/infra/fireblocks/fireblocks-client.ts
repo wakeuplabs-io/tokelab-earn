@@ -104,10 +104,7 @@ export class FireblocksClient {
    */
   async createVaultAccount(params: CreateVaultAccountParams): Promise<CreateVaultAccountResult> {
     try {
-      const vaultAccount = await this.sdk.createVaultAccount(params.name, {
-        hiddenOnUI: params.hiddenOnUI ?? false,
-        customerRefId: params.customerRefId,
-      });
+      const vaultAccount = await this.sdk.createVaultAccount(params.name, params.hiddenOnUI ?? false, params.customerRefId);
 
       return {
         id: vaultAccount.id,
@@ -153,7 +150,6 @@ export class FireblocksClient {
         address: address.address,
         tag: address.tag,
         legacyAddress: address.legacyAddress,
-        bip44AddressIndex: address.bip44AddressIndex,
       };
     } catch (error) {
       throw new FireblocksError(
@@ -184,7 +180,7 @@ export class FireblocksClient {
 
       return {
         id: transaction.id,
-        status: transaction.status,
+        status: transaction.status as TransactionStatus,
       };
     } catch (error) {
       throw new FireblocksError(
@@ -206,9 +202,9 @@ export class FireblocksClient {
         assetId: tx.assetId,
         source: tx.source,
         destination: tx.destination,
-        amount: tx.amount,
+        amount: tx.amount.toString(),
         status: tx.status,
-        operation: tx.operation,
+        operation: TransactionOperation.TRANSFER,
         createdAt: tx.createdAt,
         lastUpdated: tx.lastUpdated,
         note: tx.note,
@@ -228,7 +224,7 @@ export class FireblocksClient {
   async getVaultBalance(vaultAccountId: string, assetId: string): Promise<string> {
     try {
       const account = await this.sdk.getVaultAccountById(vaultAccountId);
-      const asset = account.assets?.find((a) => a.id === assetId);
+      const asset = account.assets?.find((a: any) => a.id === assetId);
       return asset?.total ?? "0";
     } catch (error) {
       throw new FireblocksError(

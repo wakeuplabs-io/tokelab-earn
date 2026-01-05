@@ -4,7 +4,6 @@
  */
 
 import { PrismaClient } from "../generated/prisma/client";
-import getPrismaClient from "../config/database";
 
 export interface IdempotencyRecord {
   key: string;
@@ -20,7 +19,7 @@ export interface IdempotencyRecord {
 export async function checkIdempotency(
   key: string,
   resourceType: string,
-  prisma: PrismaClient = getPrismaClient()
+  prisma: PrismaClient 
 ): Promise<string | null> {
   // In a real implementation, you'd have an idempotency table
   // For now, we'll check in the specific resource tables
@@ -54,7 +53,7 @@ export async function storeIdempotency(
   key: string,
   resourceType: string,
   resourceId: string,
-  prisma: PrismaClient = getPrismaClient()
+  prisma: PrismaClient
 ): Promise<void> {
   // In production, implement a proper idempotency table
   // For withdrawals, the idempotencyKey is already in the withdrawal table
