@@ -1,0 +1,72 @@
+name: Deploy Staging
+
+on:
+  push:
+    branches:
+      - develop
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: staging
+
+    steps:
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v3
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ vars.AWS_REGION }}
+          mask-aws-account-id: "no"
+
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Cache npm dependencies
+        id: restore-cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.npm
+            **/node_modules
+            ~/.cache
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+
+      # Conditional install (npm install or npm ci)
+      - name: Conditional install (npm install or npm ci)
+        run: |
+          if [[ "${{ steps.restore-cache.outputs.cache-hit }}" == "true" ]]; then
+            echo ":white_check_mark: Cache hit – using npm install"
+            npm install --prefer-offline --no-fund --include=optional
+          else
+            echo ":no_entry_sign: No cache – using npm ci"
+            npm ci --no-fund --include=optional
+          fi
+
+      - name: Generate Prisma Client
+        run: npm run db:generate --workspace=packages/api
+
+      - name: Build all
+        run: npm run build
+        env:
+          CI: true
+
+      - name: Migrate database
+        working-directory: ./packages/api
+        run: npm run prisma:migrate
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+
+      - name: Deploy
+        run: npm run deploy:app:staging
+        env:
+          NODE_ENV: staging
+          DOMAIN_SUFFIX: ${{ vars.DOMAIN_SUFFIX }}
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}

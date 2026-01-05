@@ -1,4 +1,4 @@
-import ProvidersWrapper from "@/hoc/ProvidersWrapper.tsx";
+import { ProvidersWrapper } from "./hoc/ProvidersWrapper";
 import React from "react";
 import ReactDOM from "react-dom/client";
 import App from "./App.tsx";
@@ -9,5 +9,5 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
     <ProvidersWrapper>
       <App />
     </ProvidersWrapper>
-  </React.StrictMode>
+  </React.StrictMode>,
 );

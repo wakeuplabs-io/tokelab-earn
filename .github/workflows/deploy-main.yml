@@ -1,0 +1,90 @@
+name: Deploy Production
+
+on:
+  workflow_dispatch
+  # push:
+  #   branches:
+  #     - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: production
+
+    steps:
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v3
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ vars.AWS_REGION }}
+          mask-aws-account-id: "no"
+
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Cache npm dependencies
+        id: restore-cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.npm
+            **/node_modules
+            ~/.cache
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+
+      # Conditional install (npm install or npm ci)
+      - name: Conditional install (npm install or npm ci)
+        run: |
+          if [[ "${{ steps.restore-cache.outputs.cache-hit }}" == "true" ]]; then
+            echo ":white_check_mark: Cache hit – using npm install"
+            npm install --prefer-offline --no-fund --include=optional
+          else
+            echo ":no_entry_sign: No cache – using npm ci"
+            npm ci --no-fund --include=optional
+          fi
+
+      - name: Generate Prisma Client
+        run: npm run db:generate --workspace=packages/api
+
+      - name: Build all
+        run: npm run build
+        env:
+          CI: true
+
+      - name: Migrate database
+        working-directory: ./packages/api
+        run: npm run prisma:migrate
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+
+      - name: Deploy
+        run: npm run deploy:app:production
+        env:
+          NODE_ENV: production
+          DOMAIN_SUFFIX: ${{ vars.DOMAIN_SUFFIX }}
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          WEB3AUTH_CLIENT_ID: ${{ secrets.WEB3AUTH_CLIENT_ID }}
+          WEB3AUTH_CLIENT_SECRET: ${{ secrets.WEB3AUTH_CLIENT_SECRET }}
+          RPC_URL: ${{ secrets.RPC_URL }}
+          PRIVATE_KEY: ${{ secrets.PRIVATE_KEY }}
+          ALCHEMY_AUTH_TOKEN: ${{ secrets.ALCHEMY_AUTH_TOKEN }}
+          ALCHEMY_APP_ID: ${{ secrets.ALCHEMY_APP_ID }}
+          ALCHEMY_WEBHOOK_SIGNING_KEY: ${{ secrets.ALCHEMY_WEBHOOK_SIGNING_KEY }}
+          PAYMENT_TOKEN_ADDRESS: ${{ vars.VITE_PAYMENT_TOKEN_ADDRESS }}
+          PAYMENT_TOKEN_DECIMALS: ${{ vars.VITE_PAYMENT_TOKEN_DECIMALS }}
+          BUNDLER_URL: ${{ vars.VITE_BUNDLER_URL }}
+          METAMAP_CLIENT_ID: ${{ vars.VITE_METAMAP_CLIENT_ID }}
+          METAMAP_FLOW_ID: ${{ vars.VITE_METAMAP_FLOW_ID }}
+          METAMAP_WEBHOOK_SECRET: ${{ secrets.METAMAP_WEBHOOK_SECRET }}
+          ETHERSCAN_API_KEY: ${{ secrets.ETHERSCAN_API_KEY }}
+          PINATA_JWT: ${{ secrets.PINATA_JWT }}
+          PINATA_GROUP_ID: ${{ vars.PINATA_GROUP_ID }}
+          PINATA_GATEWAY_URL: ${{ vars.PINATA_GATEWAY_URL }}
