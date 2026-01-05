@@ -17,9 +17,9 @@ export interface IdempotencyRecord {
  * Returns the existing resource ID if found
  */
 export async function checkIdempotency(
-  key: string,
+  //key: string,
   resourceType: string,
-  prisma: PrismaClient,
+  //prisma: PrismaClient,
 ): Promise<string | null> {
   // In a real implementation, you'd have an idempotency table
   // For now, we'll check in the specific resource tables
@@ -29,12 +29,12 @@ export async function checkIdempotency(
 
   switch (resourceType) {
     case "withdrawal":
-      const withdrawal = await prisma.withdrawal.findUnique({
+      /*    const withdrawal = await prisma.withdrawal.findUnique({
         where: { idempotencyKey: key },
         select: { id: true },
-      });
-      return withdrawal?.id ?? null;
-
+      }); */
+      // return withdrawal?.id ?? null;
+      return null as unknown as string;
     case "vault":
       // Check if vault was created with this key (stored in metadata)
       // This is a placeholder - implement based on your metadata structure
@@ -55,6 +55,7 @@ export async function storeIdempotency(
   resourceId: string,
   prisma: PrismaClient,
 ): Promise<void> {
+  console.log("storeIdempotency", key, resourceType, resourceId, prisma);
   // In production, implement a proper idempotency table
   // For withdrawals, the idempotencyKey is already in the withdrawal table
   // This function is a placeholder for other resource types

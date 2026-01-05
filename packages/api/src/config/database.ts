@@ -4,7 +4,6 @@
  */
 
 import { PrismaClient } from "../generated/prisma/client";
-import { Pool, neonConfig } from "@neondatabase/serverless";
 import { PrismaNeon } from "@prisma/adapter-neon";
 
 let prisma: PrismaClient;
@@ -22,7 +21,6 @@ export function getPrismaClient(): PrismaClient {
     }
 
     // Create Neon connection pool
-    const pool = new Pool({ connectionString });
     const poolConfig = {
       connectionString,
       directUrl: process.env.DIRECT_URL,

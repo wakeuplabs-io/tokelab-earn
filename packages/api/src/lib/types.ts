@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/ban-types */
 import type { Hono } from "hono";
 import type { Schema } from "hono";
 import type { PinoLogger } from "hono-pino";
@@ -9,4 +8,4 @@ export interface AppBindings {
   };
 }
 
-export type AppType<S extends Schema = {}> = Hono<AppBindings, S>;
+export type AppType<S extends Schema> = Hono<AppBindings, S>;

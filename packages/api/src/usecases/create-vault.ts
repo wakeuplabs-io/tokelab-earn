@@ -12,7 +12,7 @@
  */
 
 import { VaultRepository } from "../infra/db/repositories/vault-repository";
-import { FireblocksClient } from "../infra/fireblocks/fireblocks-client";
+//import { FireblocksClient } from "../infra/fireblocks/fireblocks-client";
 import { ConflictError, DomainError } from "../libs/errors";
 import type { CreateVaultParams, Vault } from "../domain/entities/vault";
 
@@ -44,8 +44,8 @@ export async function createVault(
 
   // Step 2: Create Fireblocks vault account
   // This is the actual segregation - each user gets their own Fireblocks vault
-  let fireblocksVaultId: string;
-  let fireblocksVaultName: string;
+  //let fireblocksVaultId: string;
+  //let fireblocksVaultName: string;
 
   try {
     /*  const fireblocksResult = await deps.fireblocksClient.createVaultAccount({
@@ -65,7 +65,7 @@ export async function createVault(
   }
 
   // Step 3: Persist vault metadata in our database
-  let vault: Vault;
+  //let vault: Vault;
 
   try {
     /*    vault = await deps.vaultRepository.create({

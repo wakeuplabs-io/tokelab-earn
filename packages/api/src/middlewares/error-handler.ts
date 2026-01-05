@@ -12,14 +12,8 @@
 import { Context, Next } from "hono";
 import { ZodError } from "zod";
 import jwt from "jsonwebtoken";
-import {
-  DomainError,
-  NotFoundError,
-  ValidationError,
-  ConflictError,
-  UnauthorizedError,
-  ForbiddenError,
-} from "../libs/errors";
+import { DomainError, ValidationError } from "../libs/errors";
+import { ContentfulStatusCode } from "hono/utils/http-status";
 
 export interface ErrorResponse {
   error: string;
@@ -55,7 +49,7 @@ function handleError(c: Context, error: unknown): Response {
       response.details = error.fields;
     }
 
-    return c.json(response, error.statusCode);
+    return c.json(response, error.statusCode as ContentfulStatusCode);
   }
 
   // Zod validation errors
@@ -64,7 +58,7 @@ function handleError(c: Context, error: unknown): Response {
       {
         error: "Validation error",
         code: "VALIDATION_ERROR",
-        details: error.errors,
+        details: error.flatten().fieldErrors as Record<string, string[]>,
       },
       400,
     );
