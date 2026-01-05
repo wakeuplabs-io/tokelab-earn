@@ -3,7 +3,7 @@
  * Data access layer for User entities
  */
 
-import { PrismaClient } from "@prisma/client";
+import { PrismaClient } from "../../generated/prisma/client";
 import { User, CreateUserParams } from "../../domain/entities/user";
 import getPrismaClient from "../../config/database";
 

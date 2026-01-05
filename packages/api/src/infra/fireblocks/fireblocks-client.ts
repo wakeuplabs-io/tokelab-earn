@@ -9,7 +9,8 @@
 import { FireblocksSDK, PeerType, TransactionOperation, TransactionStatus } from "fireblocks-sdk";
 import { readFileSync } from "fs";
 import { join } from "path";
-import getEnv from "../../config/env";
+import { getEnv } from "../../config/env";
+const env = getEnv();
 
 export interface CreateVaultAccountParams {
   name: string;
@@ -87,8 +88,6 @@ export class FireblocksClient {
   private sdk: FireblocksSDK;
 
   constructor() {
-    const env = getEnv();
-    
     // Read private key from file
     const secretKeyPath = env.FIREBLOCKS_SECRET_KEY_PATH.startsWith("/")
       ? env.FIREBLOCKS_SECRET_KEY_PATH

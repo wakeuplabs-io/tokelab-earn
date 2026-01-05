@@ -3,13 +3,9 @@
  * Uses Neon serverless adapter for connection pooling
  */
 
-import { PrismaClient } from "@prisma/client";
+import { PrismaClient } from "../generated/prisma/client";
 import { Pool, neonConfig } from "@neondatabase/serverless";
 import { PrismaNeon } from "@prisma/adapter-neon";
-import ws from "ws";
-
-// Configure Neon for serverless
-neonConfig.webSocketConstructor = ws;
 
 let prisma: PrismaClient;
 
@@ -27,7 +23,11 @@ export function getPrismaClient(): PrismaClient {
 
     // Create Neon connection pool
     const pool = new Pool({ connectionString });
-    const adapter = new PrismaNeon(pool);
+    const poolConfig = {
+      connectionString,
+      directUrl: process.env.DIRECT_URL,
+    };
+    const adapter = new PrismaNeon(poolConfig);
 
     prisma = new PrismaClient({
       adapter,

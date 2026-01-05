@@ -3,7 +3,7 @@
  * Ensures operations can be safely retried
  */
 
-import { PrismaClient } from "@prisma/client";
+import { PrismaClient } from "../generated/prisma/client";
 import getPrismaClient from "../config/database";
 
 export interface IdempotencyRecord {

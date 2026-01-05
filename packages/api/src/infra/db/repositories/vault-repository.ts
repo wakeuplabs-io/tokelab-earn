@@ -3,9 +3,9 @@
  * Data access layer for Vault entities
  */
 
-import { PrismaClient, VaultStatus } from "@prisma/client";
-import { Vault, CreateVaultParams } from "../../domain/entities/vault";
-import getPrismaClient from "../../config/database";
+import { PrismaClient, VaultStatus } from "../../../generated/prisma/client";
+import { Vault, CreateVaultParams } from "../../../domain/entities/vault";
+import { getPrismaClient } from "../../../config/database";
 
 export class VaultRepository {
   constructor(private readonly prisma: PrismaClient = getPrismaClient()) {}

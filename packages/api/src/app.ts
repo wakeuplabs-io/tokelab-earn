@@ -54,4 +54,7 @@ app.get("/health", (c) => {
   return c.json({ status: "ok", timestamp: new Date().toISOString() });
 });
 
+// Export type for Hono RPC client
+export type AppType = typeof app;
+
 export default app;
