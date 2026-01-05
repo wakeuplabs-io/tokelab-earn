@@ -51,6 +51,9 @@ jobs:
             npm ci --no-fund
           fi
 
+      - name: Generate Prisma Client
+        run: npm run db:generate --workspace=packages/api
+
       - name: Build all
         run: npm run build
         env:
