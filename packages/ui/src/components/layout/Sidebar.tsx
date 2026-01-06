@@ -11,6 +11,7 @@ import {
   HiOutlineCheck,
   HiOutlineChartBar,
   HiOutlineQuestionMarkCircle,
+  HiOutlineDocumentReport,
   HiLogout,
 } from "react-icons/hi";
 import { useAuth } from "../../hooks/auth/useAuth";
@@ -29,6 +30,7 @@ const sidebarItems: SidebarItem[] = [
   { label: "Ingresar capital", path: "/deposit", icon: <HiOutlineCreditCard className="w-6 h-6" /> },
   { label: "Retirar Capital", path: "/withdraw", icon: <HiOutlineArrowDown className="w-6 h-6" /> },
   { label: "Inversiones activas", path: "/active-investments", icon: <HiOutlineCheck className="w-6 h-6" /> },
+  { label: "Historial de inversiones", path: "/investment-history", icon: <HiOutlineDocumentReport className="w-6 h-6" /> },
   { label: "Reportes", path: "/reports", icon: <HiOutlineChartBar className="w-6 h-6" /> },
   { label: "Ayuda", path: "/help", icon: <HiOutlineQuestionMarkCircle className="w-6 h-6" /> },
 ];

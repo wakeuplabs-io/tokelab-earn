@@ -31,6 +31,15 @@ const IDS = {
   INV_FIXED_COMPLETED: '44444444-4444-4444-4444-444444444004',
   INV_FIXED_INVESTOR2: '44444444-4444-4444-4444-444444444005',
   INV_CANCELLED: '44444444-4444-4444-4444-444444444006',
+  INV_FIXED_ACTIVE_3: '44444444-4444-4444-4444-444444444007',
+  INV_FIXED_ACTIVE_4: '44444444-4444-4444-4444-444444444008',
+  INV_VARIABLE_ACTIVE_2: '44444444-4444-4444-4444-444444444009',
+  INV_VARIABLE_ACTIVE_3: '44444444-4444-4444-4444-444444444010',
+  INV_FIXED_COMPLETED_2: '44444444-4444-4444-4444-444444444011',
+  INV_FIXED_COMPLETED_3: '44444444-4444-4444-4444-444444444012',
+  INV_VARIABLE_COMPLETED: '44444444-4444-4444-4444-444444444013',
+  INV_CANCELLED_2: '44444444-4444-4444-4444-444444444014',
+  INV_FIXED_INVESTOR3: '44444444-4444-4444-4444-444444444015',
 
   // Monthly Yields
   MONTHLY_YIELD_1: '55555555-5555-5555-5555-555555555001',
@@ -399,7 +408,169 @@ async function seedInvestments(
     })
   )
 
-  console.log('  ✓ Created 6 investments')
+  // Investment 7: FIXED active - investor1 - started 4 months ago
+  investments.push(
+    await prisma.investment.create({
+      data: {
+        id: IDS.INV_FIXED_ACTIVE_3,
+        userId: users.investor1.id,
+        modelConfigId: models.fixedModel.id,
+        amount: new Decimal('8000.000000'),
+        currency: 'USDT',
+        durationDays: 365,
+        status: 'ACTIVE',
+        startDate: daysAgo(120),
+        endDate: daysFromNow(245),
+        accruedYield: new Decimal('320.000000'),
+      },
+    })
+  )
+
+  // Investment 8: FIXED active - investor2 - started 6 months ago
+  investments.push(
+    await prisma.investment.create({
+      data: {
+        id: IDS.INV_FIXED_ACTIVE_4,
+        userId: users.investor2.id,
+        modelConfigId: models.fixedModel.id,
+        amount: new Decimal('15000.000000'),
+        currency: 'USDT',
+        durationDays: 365,
+        status: 'ACTIVE',
+        startDate: daysAgo(180),
+        endDate: daysFromNow(185),
+        accruedYield: new Decimal('900.000000'),
+      },
+    })
+  )
+
+  // Investment 9: VARIABLE active - investor1 - started 5 months ago
+  investments.push(
+    await prisma.investment.create({
+      data: {
+        id: IDS.INV_VARIABLE_ACTIVE_2,
+        userId: users.investor1.id,
+        modelConfigId: models.variableModel.id,
+        amount: new Decimal('25000.000000'),
+        currency: 'USDT',
+        durationDays: 365,
+        status: 'ACTIVE',
+        startDate: daysAgo(150),
+        endDate: daysFromNow(215),
+        accruedYield: new Decimal('1250.000000'),
+      },
+    })
+  )
+
+  // Investment 10: VARIABLE active - investor3 - started 200 days ago
+  investments.push(
+    await prisma.investment.create({
+      data: {
+        id: IDS.INV_VARIABLE_ACTIVE_3,
+        userId: users.investor3.id,
+        modelConfigId: models.variableModel.id,
+        amount: new Decimal('12000.000000'),
+        currency: 'USDT',
+        durationDays: 365,
+        status: 'ACTIVE',
+        startDate: daysAgo(200),
+        endDate: daysFromNow(165),
+        accruedYield: new Decimal('720.000000'),
+      },
+    })
+  )
+
+  // Investment 11: FIXED completed - investor1 - finished 35 days ago
+  investments.push(
+    await prisma.investment.create({
+      data: {
+        id: IDS.INV_FIXED_COMPLETED_2,
+        userId: users.investor1.id,
+        modelConfigId: models.fixedModel.id,
+        amount: new Decimal('4000.000000'),
+        currency: 'USDT',
+        durationDays: 365,
+        status: 'COMPLETED',
+        startDate: daysAgo(400),
+        endDate: daysAgo(35),
+        accruedYield: new Decimal('400.000000'),
+      },
+    })
+  )
+
+  // Investment 12: FIXED completed - investor2 - finished 70 days ago
+  investments.push(
+    await prisma.investment.create({
+      data: {
+        id: IDS.INV_FIXED_COMPLETED_3,
+        userId: users.investor2.id,
+        modelConfigId: models.fixedModel.id,
+        amount: new Decimal('6000.000000'),
+        currency: 'USDT',
+        durationDays: 180,
+        status: 'COMPLETED',
+        startDate: daysAgo(250),
+        endDate: daysAgo(70),
+        accruedYield: new Decimal('240.000000'),
+      },
+    })
+  )
+
+  // Investment 13: VARIABLE completed - investor1 - finished 85 days ago
+  investments.push(
+    await prisma.investment.create({
+      data: {
+        id: IDS.INV_VARIABLE_COMPLETED,
+        userId: users.investor1.id,
+        modelConfigId: models.variableModel.id,
+        amount: new Decimal('18000.000000'),
+        currency: 'USDT',
+        durationDays: 365,
+        status: 'COMPLETED',
+        startDate: daysAgo(450),
+        endDate: daysAgo(85),
+        accruedYield: new Decimal('1620.000000'),
+      },
+    })
+  )
+
+  // Investment 14: FIXED cancelled - investor2 - cancelled 50 days ago
+  investments.push(
+    await prisma.investment.create({
+      data: {
+        id: IDS.INV_CANCELLED_2,
+        userId: users.investor2.id,
+        modelConfigId: models.fixedModel.id,
+        amount: new Decimal('3500.000000'),
+        currency: 'USDT',
+        durationDays: 180,
+        status: 'CANCELLED',
+        startDate: daysAgo(100),
+        endDate: daysAgo(50),
+        accruedYield: new Decimal('0'),
+      },
+    })
+  )
+
+  // Investment 15: FIXED active - investor3 - started 75 days ago
+  investments.push(
+    await prisma.investment.create({
+      data: {
+        id: IDS.INV_FIXED_INVESTOR3,
+        userId: users.investor3.id,
+        modelConfigId: models.fixedModel.id,
+        amount: new Decimal('7500.000000'),
+        currency: 'USDT',
+        durationDays: 180,
+        status: 'ACTIVE',
+        startDate: daysAgo(75),
+        endDate: daysFromNow(105),
+        accruedYield: new Decimal('125.000000'),
+      },
+    })
+  )
+
+  console.log('  ✓ Created 15 investments')
   return investments
 }
 

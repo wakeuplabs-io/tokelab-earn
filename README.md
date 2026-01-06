@@ -1,5 +1,15 @@
 # React Monorepo Template
 
+## Quick Start
+
+```bash
+npm install
+npm run db:setup   # Levanta Docker + migra + seed (si DB vacía)
+npm run dev
+```
+
+---
+
 ## Node and NPM version
 
 TL;DR
