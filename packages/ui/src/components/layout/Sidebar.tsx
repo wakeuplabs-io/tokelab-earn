@@ -27,10 +27,22 @@ export interface SidebarItem {
 const sidebarItems: SidebarItem[] = [
   { label: "Inicio", path: "/", icon: <HiOutlineHome className="w-6 h-6" /> },
   { label: "Invertir", path: "/invest", icon: <HiOutlineCurrencyDollar className="w-6 h-6" /> },
-  { label: "Ingresar capital", path: "/deposit", icon: <HiOutlineCreditCard className="w-6 h-6" /> },
+  {
+    label: "Ingresar capital",
+    path: "/deposit",
+    icon: <HiOutlineCreditCard className="w-6 h-6" />,
+  },
   { label: "Retirar Capital", path: "/withdraw", icon: <HiOutlineArrowDown className="w-6 h-6" /> },
-  { label: "Inversiones activas", path: "/active-investments", icon: <HiOutlineCheck className="w-6 h-6" /> },
-  { label: "Historial de inversiones", path: "/investment-history", icon: <HiOutlineDocumentReport className="w-6 h-6" /> },
+  {
+    label: "Inversiones activas",
+    path: "/active-investments",
+    icon: <HiOutlineCheck className="w-6 h-6" />,
+  },
+  {
+    label: "Historial de inversiones",
+    path: "/investment-history",
+    icon: <HiOutlineDocumentReport className="w-6 h-6" />,
+  },
   { label: "Reportes", path: "/reports", icon: <HiOutlineChartBar className="w-6 h-6" /> },
   { label: "Ayuda", path: "/help", icon: <HiOutlineQuestionMarkCircle className="w-6 h-6" /> },
 ];
@@ -71,7 +83,7 @@ export function Sidebar({ isOpen = true, onClose }: SidebarProps) {
           {
             "translate-x-0": isOpen,
             "-translate-x-full": !isOpen,
-          }
+          },
         )}
       >
         <div className="flex flex-col h-full">
@@ -95,8 +107,10 @@ export function Sidebar({ isOpen = true, onClose }: SidebarProps) {
                       "text-base",
                       {
                         "text-primary-focus font-bold": isActive(item.path),
-                        "hover:bg-base-200 font-semibold   text-neutral-l-grey": !isActive(item.path),
-                      }
+                        "hover:bg-base-200 font-semibold   text-neutral-l-grey": !isActive(
+                          item.path,
+                        ),
+                      },
                     )}
                     onClick={onClose}
                   >
@@ -128,4 +142,3 @@ export function Sidebar({ isOpen = true, onClose }: SidebarProps) {
     </>
   );
 }
-

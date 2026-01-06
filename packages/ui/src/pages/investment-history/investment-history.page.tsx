@@ -10,8 +10,17 @@ import { Card, CardBody } from "../../components/ui/card";
 import { Input } from "../../components/ui/input";
 import { Loading } from "../../components/feedback/loading";
 import { ErrorMessage } from "../../components/feedback/error-message";
-import { HiOutlineSearch, HiOutlineCalendar, HiOutlineChevronLeft, HiOutlineChevronRight } from "react-icons/hi";
-import type { InvestmentStatus, InvestmentModelType, Investment } from "../../domain/entities/investment";
+import {
+  HiOutlineSearch,
+  HiOutlineCalendar,
+  HiOutlineChevronLeft,
+  HiOutlineChevronRight,
+} from "react-icons/hi";
+import type {
+  InvestmentStatus,
+  InvestmentModelType,
+  Investment,
+} from "../../domain/entities/investment";
 
 /**
  * Format date to DD/MM/YYYY
@@ -151,13 +160,27 @@ export function InvestmentHistoryPage() {
               <table className="table w-full">
                 <thead>
                   <tr className="border-b border-base-300">
-                    <th className="bg-base-200/50 text-xs font-medium text-base-content/50 uppercase px-4 py-3">Usuario</th>
-                    <th className="bg-base-200/50 text-xs font-medium text-base-content/50 uppercase px-4 py-3">Estado</th>
-                    <th className="bg-base-200/50 text-xs font-medium text-base-content/50 uppercase px-4 py-3">Modelo</th>
-                    <th className="bg-base-200/50 text-xs font-medium text-base-content/50 uppercase px-4 py-3">Inicio</th>
-                    <th className="bg-base-200/50 text-xs font-medium text-base-content/50 uppercase px-4 py-3">Fin</th>
-                    <th className="bg-base-200/50 text-xs font-medium text-base-content/50 uppercase px-4 py-3">APR/RM</th>
-                    <th className="bg-base-200/50 text-xs font-medium text-base-content/50 uppercase text-right px-4 py-3">Invertido</th>
+                    <th className="bg-base-200/50 text-xs font-medium text-base-content/50 uppercase px-4 py-3">
+                      Usuario
+                    </th>
+                    <th className="bg-base-200/50 text-xs font-medium text-base-content/50 uppercase px-4 py-3">
+                      Estado
+                    </th>
+                    <th className="bg-base-200/50 text-xs font-medium text-base-content/50 uppercase px-4 py-3">
+                      Modelo
+                    </th>
+                    <th className="bg-base-200/50 text-xs font-medium text-base-content/50 uppercase px-4 py-3">
+                      Inicio
+                    </th>
+                    <th className="bg-base-200/50 text-xs font-medium text-base-content/50 uppercase px-4 py-3">
+                      Fin
+                    </th>
+                    <th className="bg-base-200/50 text-xs font-medium text-base-content/50 uppercase px-4 py-3">
+                      APR/RM
+                    </th>
+                    <th className="bg-base-200/50 text-xs font-medium text-base-content/50 uppercase text-right px-4 py-3">
+                      Invertido
+                    </th>
                     <th className="bg-base-200/50 text-xs font-medium text-base-content/50 uppercase text-right px-4 py-3">
                       <span className="block">Ganancia</span>
                       <span className="block">Acumulada</span>
@@ -187,23 +210,42 @@ export function InvestmentHistoryPage() {
                     investments.map((investment: Investment) => {
                       const statusBadge = getStatusBadge(investment.status);
                       return (
-                        <tr key={investment.id} className="border-b border-base-200 hover:bg-base-50">
+                        <tr
+                          key={investment.id}
+                          className="border-b border-base-200 hover:bg-base-50"
+                        >
                           <td className="text-sm px-4 py-4">{investment.userEmail}</td>
                           <td className="px-4 py-4">
                             <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium border-2 border-base-300 bg-white text-base-content">
-                              <span className={`w-1.5 h-1.5 rounded-full mr-1.5 ${statusBadge.dotColor}`}></span>
+                              <span
+                                className={`w-1.5 h-1.5 rounded-full mr-1.5 ${statusBadge.dotColor}`}
+                              ></span>
                               {statusBadge.label}
                             </span>
                           </td>
-                          <td className="text-sm px-4 py-4">{getModelTypeLabel(investment.modelType)}</td>
+                          <td className="text-sm px-4 py-4">
+                            {getModelTypeLabel(investment.modelType)}
+                          </td>
                           <td className="text-sm px-4 py-4">{formatDate(investment.startDate)}</td>
                           <td className="text-sm px-4 py-4">{formatDate(investment.endDate)}</td>
-                          <td className="text-sm px-4 py-4">{investment.currentAPR ? `${investment.currentAPR}%` : "-"}</td>
-                          <td className="text-sm text-right px-4 py-4">{formatNumber(investment.initialAmount)}</td>
-                          <td className="text-sm text-right px-4 py-4">{formatNumber(investment.accruedYield)}</td>
-                          <td className="text-sm text-right px-4 py-4">{investment.daysToCollect}</td>
-                          <td className="text-sm text-right px-4 py-4">{formatNumber(investment.availableToClaim)}</td>
-                          <td className="text-sm text-right px-4 py-4">{formatNumber(investment.totalClaimed)}</td>
+                          <td className="text-sm px-4 py-4">
+                            {investment.currentAPR ? `${investment.currentAPR}%` : "-"}
+                          </td>
+                          <td className="text-sm text-right px-4 py-4">
+                            {formatNumber(investment.initialAmount)}
+                          </td>
+                          <td className="text-sm text-right px-4 py-4">
+                            {formatNumber(investment.accruedYield)}
+                          </td>
+                          <td className="text-sm text-right px-4 py-4">
+                            {investment.daysToCollect}
+                          </td>
+                          <td className="text-sm text-right px-4 py-4">
+                            {formatNumber(investment.availableToClaim)}
+                          </td>
+                          <td className="text-sm text-right px-4 py-4">
+                            {formatNumber(investment.totalClaimed)}
+                          </td>
                         </tr>
                       );
                     })
@@ -242,7 +284,7 @@ export function InvestmentHistoryPage() {
                     >
                       {p}
                     </button>
-                  )
+                  ),
                 )}
                 <Button
                   variant="ghost"

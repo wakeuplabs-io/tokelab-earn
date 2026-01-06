@@ -11,10 +11,7 @@
 
 import { describe, it, expect } from "vitest";
 import { get } from "../../helpers/test-app";
-import type {
-  InvestmentDTO,
-  ListInvestmentsResult,
-} from "../../../src/domain/entities/investment";
+import type { ListInvestmentsResult } from "../../../src/domain/entities/investment";
 
 const ENDPOINT = "/api/admin/investments";
 
@@ -175,8 +172,7 @@ describe("GET /api/admin/investments", () => {
 
       // Sort by start date and pick a middle date
       const sorted = [...all.data.data].sort(
-        (a, b) =>
-          new Date(a.startDate).getTime() - new Date(b.startDate).getTime()
+        (a, b) => new Date(a.startDate).getTime() - new Date(b.startDate).getTime(),
       );
       const midDate = sorted[Math.floor(sorted.length / 2)].startDate;
       const dateFrom = midDate.split("T")[0];
@@ -189,7 +185,7 @@ describe("GET /api/admin/investments", () => {
       expect(response.status).toBe(200);
       data.data.forEach((inv) => {
         expect(new Date(inv.startDate).getTime()).toBeGreaterThanOrEqual(
-          new Date(dateFrom).getTime()
+          new Date(dateFrom).getTime(),
         );
       });
     });
@@ -199,8 +195,7 @@ describe("GET /api/admin/investments", () => {
       if (all.data.data.length === 0) return;
 
       const sorted = [...all.data.data].sort(
-        (a, b) =>
-          new Date(a.startDate).getTime() - new Date(b.startDate).getTime()
+        (a, b) => new Date(a.startDate).getTime() - new Date(b.startDate).getTime(),
       );
       const midDate = sorted[Math.floor(sorted.length / 2)].startDate;
       const dateTo = midDate.split("T")[0];
@@ -224,8 +219,7 @@ describe("GET /api/admin/investments", () => {
       if (all.data.data.length < 2) return;
 
       const sorted = [...all.data.data].sort(
-        (a, b) =>
-          new Date(a.startDate).getTime() - new Date(b.startDate).getTime()
+        (a, b) => new Date(a.startDate).getTime() - new Date(b.startDate).getTime(),
       );
 
       const dateFrom = sorted[0].startDate.split("T")[0];
@@ -240,9 +234,7 @@ describe("GET /api/admin/investments", () => {
       expect(response.status).toBe(200);
       data.data.forEach((inv) => {
         const invDate = new Date(inv.startDate);
-        expect(invDate.getTime()).toBeGreaterThanOrEqual(
-          new Date(dateFrom).getTime()
-        );
+        expect(invDate.getTime()).toBeGreaterThanOrEqual(new Date(dateFrom).getTime());
       });
     });
 
@@ -330,9 +322,7 @@ describe("GET /api/admin/investments", () => {
       });
 
       data.data.forEach((inv) => {
-        expect(
-          typeof inv.currentAPR === "number" || inv.currentAPR === null
-        ).toBe(true);
+        expect(typeof inv.currentAPR === "number" || inv.currentAPR === null).toBe(true);
       });
     });
 
@@ -383,7 +373,7 @@ describe("GET /api/admin/investments", () => {
         // Sum of availableToClaim + totalClaimed should be <= accruedYield
         // (there might be pending yields not yet claimable)
         expect(availableToClaim + totalClaimed).toBeLessThanOrEqual(
-          accruedYield + 0.001 // Small tolerance for floating point
+          accruedYield + 0.001, // Small tolerance for floating point
         );
       });
     });

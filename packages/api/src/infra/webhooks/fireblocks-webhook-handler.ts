@@ -4,11 +4,7 @@
  */
 
 import { Context } from "hono";
-import {
-  verifyFireblocksWebhook,
-  parseWebhookPayload,
-  type FireblocksWebhookPayload,
-} from "../fireblocks/webhook-verifier";
+import { verifyFireblocksWebhook, parseWebhookPayload } from "../fireblocks/webhook-verifier";
 
 /**
  * Handle Fireblocks webhook

@@ -46,7 +46,7 @@ function calculateLastCompletedMonthAPR(
   aprInitial: number,
   aprFinal: number,
   aprStepPct: number,
-  aprStepPeriodDays: number
+  aprStepPeriodDays: number,
 ): number {
   const now = new Date();
 
@@ -55,8 +55,7 @@ function calculateLastCompletedMonthAPR(
 
   // Calculate days from start to end of last completed month
   const daysSinceStart = Math.floor(
-    (firstDayOfCurrentMonth.getTime() - startDate.getTime()) /
-      (1000 * 60 * 60 * 24)
+    (firstDayOfCurrentMonth.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24),
   );
 
   // If investment started this month or later, no completed months yet
@@ -79,14 +78,9 @@ function calculateLastCompletedMonthAPR(
  * @param claimPeriodDays - Days between claim windows (e.g., 60)
  * @returns Days until next claim window
  */
-function calculateDaysToNextClaimFixed(
-  startDate: Date,
-  claimPeriodDays: number
-): number {
+function calculateDaysToNextClaimFixed(startDate: Date, claimPeriodDays: number): number {
   const now = new Date();
-  const daysSinceStart = Math.floor(
-    (now.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24)
-  );
+  const daysSinceStart = Math.floor((now.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
 
   if (daysSinceStart < 0) {
     // Investment hasn't started yet
@@ -108,12 +102,10 @@ function calculateDaysToNextClaimFixed(
  * @returns 0 if claimable now, otherwise days until end of current month
  */
 function calculateDaysToNextClaimVariable(
-  yields: Array<{ status: string; monthlyYieldId: string | null }>
+  yields: Array<{ status: string; monthlyYieldId: string | null }>,
 ): number {
   // Check if there are PENDING yields with monthlyYieldId (claimable now)
-  const hasClaimableYield = yields.some(
-    (y) => y.status === "PENDING" && y.monthlyYieldId !== null
-  );
+  const hasClaimableYield = yields.some((y) => y.status === "PENDING" && y.monthlyYieldId !== null);
 
   if (hasClaimableYield) {
     return 0;
@@ -122,17 +114,13 @@ function calculateDaysToNextClaimVariable(
   // Calculate days until end of current month
   const now = new Date();
   const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);
-  return Math.ceil(
-    (endOfMonth.getTime() - now.getTime()) / (1000 * 60 * 60 * 24)
-  );
+  return Math.ceil((endOfMonth.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
 }
 
 /**
  * Calculate days to collect based on model type
  */
-function calculateDaysToCollect(
-  investment: InvestmentWithRelations
-): number {
+function calculateDaysToCollect(investment: InvestmentWithRelations): number {
   if (investment.modelConfig.type === "FIXED") {
     const claimPeriodDays = investment.modelConfig.claimPeriodDays;
     if (claimPeriodDays) {
@@ -154,9 +142,7 @@ function calculateDaysToCollect(
  * @param yields - Array of yield records
  * @returns Total yield amount as string
  */
-function calculateAccruedYield(
-  yields: Array<{ amount: string; status: string }>
-): string {
+function calculateAccruedYield(yields: Array<{ amount: string; status: string }>): string {
   const total = yields.reduce((sum, y) => sum + parseFloat(y.amount), 0);
   return total.toFixed(6);
 }
@@ -166,24 +152,20 @@ function calculateAccruedYield(
  * FIXED: PENDING yields from completed claim periods
  * VARIABLE: PENDING yields with monthlyYieldId (MonthlyYield processed)
  */
-function calculateAvailableToClaim(
-  investment: InvestmentWithRelations
-): string {
+function calculateAvailableToClaim(investment: InvestmentWithRelations): string {
   const pendingYields = investment.yields.filter((y) => y.status === "PENDING");
 
   if (investment.modelConfig.type === "FIXED") {
     const claimPeriodDays = investment.modelConfig.claimPeriodDays;
     if (!claimPeriodDays) {
       // No claim period configured, all pending are available
-      return pendingYields
-        .reduce((sum, y) => sum + parseFloat(y.amount), 0)
-        .toFixed(6);
+      return pendingYields.reduce((sum, y) => sum + parseFloat(y.amount), 0).toFixed(6);
     }
 
     // Calculate how many complete claim periods have passed
     const now = new Date();
     const daysSinceStart = Math.floor(
-      (now.getTime() - investment.startDate.getTime()) / (1000 * 60 * 60 * 24)
+      (now.getTime() - investment.startDate.getTime()) / (1000 * 60 * 60 * 24),
     );
     const completedPeriods = Math.floor(daysSinceStart / claimPeriodDays);
 
@@ -193,28 +175,20 @@ function calculateAvailableToClaim(
 
     // All pending yields are claimable if at least one period is complete
     // (In a more complex implementation, you might track which yields belong to which period)
-    return pendingYields
-      .reduce((sum, y) => sum + parseFloat(y.amount), 0)
-      .toFixed(6);
+    return pendingYields.reduce((sum, y) => sum + parseFloat(y.amount), 0).toFixed(6);
   }
 
   // VARIABLE: Only yields with monthlyYieldId are claimable
   const claimableYields = pendingYields.filter((y) => y.monthlyYieldId !== null);
-  return claimableYields
-    .reduce((sum, y) => sum + parseFloat(y.amount), 0)
-    .toFixed(6);
+  return claimableYields.reduce((sum, y) => sum + parseFloat(y.amount), 0).toFixed(6);
 }
 
 /**
  * Calculate total claimed (PAID yields)
  */
-function calculateTotalClaimed(
-  yields: Array<{ amount: string; status: string }>
-): string {
+function calculateTotalClaimed(yields: Array<{ amount: string; status: string }>): string {
   const paidYields = yields.filter((y) => y.status === "PAID");
-  return paidYields
-    .reduce((sum, y) => sum + parseFloat(y.amount), 0)
-    .toFixed(6);
+  return paidYields.reduce((sum, y) => sum + parseFloat(y.amount), 0).toFixed(6);
 }
 
 /**
@@ -222,10 +196,7 @@ function calculateTotalClaimed(
  * @param investment - Investment with relations
  * @param variableAPR - APR from MonthlyYield for VARIABLE model (null if not available)
  */
-function toDTO(
-  investment: InvestmentWithRelations,
-  variableAPR: number | null
-): InvestmentDTO {
+function toDTO(investment: InvestmentWithRelations, variableAPR: number | null): InvestmentDTO {
   let currentAPR: number | null = null;
 
   if (investment.modelConfig.type === "FIXED") {
@@ -241,7 +212,7 @@ function toDTO(
         parseFloat(investment.modelConfig.aprInitial),
         parseFloat(investment.modelConfig.aprFinal),
         parseFloat(investment.modelConfig.aprStepPct),
-        investment.modelConfig.aprStepPeriodDays
+        investment.modelConfig.aprStepPeriodDays,
       );
     }
   } else {
@@ -277,7 +248,7 @@ export async function listInvestments(
   deps: {
     investmentRepository: InvestmentRepository;
     monthlyYieldRepository: MonthlyYieldRepository;
-  }
+  },
 ): Promise<ListInvestmentsResult> {
   const { page, limit, filters } = params;
 
@@ -296,9 +267,7 @@ export async function listInvestments(
   ]);
 
   // Get variable APR from previous month's MonthlyYield
-  const variableAPR = monthlyYield
-    ? parseFloat(monthlyYield.actualReturnPct)
-    : null;
+  const variableAPR = monthlyYield ? parseFloat(monthlyYield.actualReturnPct) : null;
 
   // Transform to DTOs
   const data = investments.map((inv) => toDTO(inv, variableAPR));

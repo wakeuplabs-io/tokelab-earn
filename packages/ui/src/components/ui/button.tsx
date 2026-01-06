@@ -6,7 +6,16 @@ import { ButtonHTMLAttributes, forwardRef } from "react";
 import clsx from "clsx";
 
 export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: "primary" | "secondary" | "accent" | "outline" | "ghost" | "success" | "error" | "warning" | "info";
+  variant?:
+    | "primary"
+    | "secondary"
+    | "accent"
+    | "outline"
+    | "ghost"
+    | "success"
+    | "error"
+    | "warning"
+    | "info";
   size?: "xs" | "sm" | "md" | "lg";
   isLoading?: boolean;
   fullWidth?: boolean;
@@ -14,10 +23,20 @@ export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 
 export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
   (
-    { className = "", variant = "primary", size = "md", isLoading, fullWidth, children, disabled, ...props },
+    {
+      className = "",
+      variant = "primary",
+      size = "md",
+      isLoading,
+      fullWidth,
+      children,
+      disabled,
+      ...props
+    },
     ref,
   ) => {
-    const baseClasses = "btn rounded-xl text-base font-semibold leading-[22px] align-middle tracking-normal";
+    const baseClasses =
+      "btn rounded-xl text-base font-semibold leading-[22px] align-middle tracking-normal";
     const variantClasses = {
       primary: "btn-primary",
       secondary: "btn-secondary",
@@ -39,7 +58,13 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
     return (
       <button
         ref={ref}
-        className={clsx(baseClasses, variantClasses[variant], sizeClasses[size], fullWidth && "w-full", className)}
+        className={clsx(
+          baseClasses,
+          variantClasses[variant],
+          sizeClasses[size],
+          fullWidth && "w-full",
+          className,
+        )}
         disabled={disabled || isLoading}
         {...props}
       >

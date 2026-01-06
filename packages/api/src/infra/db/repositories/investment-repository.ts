@@ -21,7 +21,7 @@ export class InvestmentRepository {
   async findAllPaginated(
     skip: number,
     take: number,
-    filters?: ListInvestmentsFilters
+    filters?: ListInvestmentsFilters,
   ): Promise<InvestmentWithRelations[]> {
     const where = this.buildWhereClause(filters);
 
@@ -91,9 +91,7 @@ export class InvestmentRepository {
   /**
    * Build Prisma where clause from filters
    */
-  private buildWhereClause(
-    filters?: ListInvestmentsFilters
-  ): Prisma.InvestmentWhereInput {
+  private buildWhereClause(filters?: ListInvestmentsFilters): Prisma.InvestmentWhereInput {
     const where: Prisma.InvestmentWhereInput = {};
 
     if (filters?.status) {

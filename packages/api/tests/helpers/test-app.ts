@@ -1,4 +1,4 @@
-  /**
+/**
  * Test helper for making HTTP requests to the Hono app
  */
 
@@ -18,7 +18,7 @@ export interface RequestOptions {
 export async function request(
   method: "GET" | "POST" | "PUT" | "DELETE" | "PATCH",
   path: string,
-  options?: RequestOptions
+  options?: RequestOptions,
 ): Promise<Response> {
   const url = new URL(path, "http://localhost");
 
@@ -57,7 +57,7 @@ export async function json<T>(response: Response): Promise<T> {
  */
 export async function get<T>(
   path: string,
-  query?: Record<string, string>
+  query?: Record<string, string>,
 ): Promise<{ response: Response; data: T }> {
   const response = await request("GET", path, { query });
   const data = await json<T>(response);

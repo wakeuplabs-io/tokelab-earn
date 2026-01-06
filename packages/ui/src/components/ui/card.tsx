@@ -11,7 +11,13 @@ export interface CardProps extends HTMLAttributes<HTMLDivElement> {
   shadow?: "none" | "sm" | "md" | "lg" | "xl";
 }
 
-export function Card({ children, className = "", variant = "default", shadow = "xl", ...props }: CardProps) {
+export function Card({
+  children,
+  className = "",
+  variant = "default",
+  shadow = "xl",
+  ...props
+}: CardProps) {
   const variantClasses = {
     default: "bg-base-100",
     bordered: "bg-base-100 border border-base-300",
@@ -27,7 +33,10 @@ export function Card({ children, className = "", variant = "default", shadow = "
   };
 
   return (
-    <div className={clsx("card p-6", variantClasses[variant], shadowClasses[shadow], className)} {...props}>
+    <div
+      className={clsx("card p-6", variantClasses[variant], shadowClasses[shadow], className)}
+      {...props}
+    >
       {children}
     </div>
   );

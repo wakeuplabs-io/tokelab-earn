@@ -62,7 +62,7 @@ export async function listInvestmentsHandler(c: Context) {
     {
       investmentRepository,
       monthlyYieldRepository,
-    }
+    },
   );
 
   return c.json(result, 200);

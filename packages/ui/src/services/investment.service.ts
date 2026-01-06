@@ -4,19 +4,13 @@
  */
 
 import { apiGet } from "../lib/api-client";
-import type {
-  ListInvestmentsParams,
-  ListInvestmentsResponse,
-} from "../domain/entities/investment";
+import type { ListInvestmentsParams, ListInvestmentsResponse } from "../domain/entities/investment";
 
 export const investmentService = {
   /**
    * List all investments with pagination and filters (Admin endpoint)
    */
-  async list(
-    params: ListInvestmentsParams,
-    token: string
-  ): Promise<ListInvestmentsResponse> {
+  async list(params: ListInvestmentsParams, token: string): Promise<ListInvestmentsResponse> {
     const searchParams = new URLSearchParams();
 
     if (params.page) searchParams.set("page", String(params.page));
@@ -30,7 +24,7 @@ export const investmentService = {
     const query = searchParams.toString();
     return apiGet<ListInvestmentsResponse>(
       `/api/admin/investments${query ? `?${query}` : ""}`,
-      token
+      token,
     );
   },
 };

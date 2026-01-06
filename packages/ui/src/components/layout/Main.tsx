@@ -19,4 +19,3 @@ export function Main({ children, className = "", ...props }: MainProps) {
     </main>
   );
 }
-

@@ -14,9 +14,7 @@ beforeAll(async () => {
   // Verify we have seed data
   const investmentCount = await prisma.investment.count();
   if (investmentCount === 0) {
-    console.warn(
-      "⚠️  No seed data found. Run `npm run db:seed` before running tests."
-    );
+    console.warn("⚠️  No seed data found. Run `npm run db:seed` before running tests.");
   }
 });
 
