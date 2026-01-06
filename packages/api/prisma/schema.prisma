@@ -10,31 +10,278 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
   directUrl = env("DIRECT_URL")
 }
 
-enum VaultStatus {
-  CREATING
+// ============================================================================
+// ENUMS
+// ============================================================================
+
+enum UserRole {
+  INVESTOR
+  ADMIN
+}
+
+enum KycStatus {
+  NOT_STARTED
+  IN_PROGRESS
+  VERIFIED
+  REJECTED
+}
+
+enum InvestmentStatus {
   ACTIVE
-  SUSPENDED
-  CLOSED
+  COMPLETED
+  CANCELLED
 }
 
+enum InvestmentModelType {
+  FIXED
+  VARIABLE
+}
+
+enum TransactionType {
+  DEPOSIT
+  WITHDRAWAL
+}
+
+enum TransactionStatus {
+  PENDING
+  PROCESSING
+  COMPLETED
+  FAILED
+}
+
+enum YieldStatus {
+  PENDING
+  PAID
+}
+
+enum MonthlyYieldStatus {
+  PENDING
+  PROCESSED
+}
+
+// ============================================================================
+// MODELS
+// ============================================================================
+
+/// System users (investors and administrators)
 model User {
-  id        String   @id @default(uuid())
-  email     String   @unique
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id                String    @id @default(uuid())
+  email             String    @unique
+  auth0Id           String    @unique @map("auth0_id")
+  firstName         String?   @map("first_name")
+  lastName          String?   @map("last_name")
+  phone             String?
+  role              UserRole  @default(INVESTOR)
+  kycStatus         KycStatus @default(NOT_STARTED) @map("kyc_status")
+  kycProviderId     String?   @map("kyc_provider_id")
+  fireblocksVaultId String?   @map("fireblocks_vault_id")
+  depositAddress    String?   @map("deposit_address")
+  availableBalance  Decimal   @default(0) @map("available_balance") @db.Decimal(20, 6)
+  lockedBalance     Decimal   @default(0) @map("locked_balance") @db.Decimal(20, 6)
+  isBlocked         Boolean   @default(false) @map("is_blocked")
+  createdAt         DateTime  @default(now()) @map("created_at")
+  updatedAt         DateTime  @updatedAt @map("updated_at")
+
+  // Relations
+  investments   Investment[]
+  transactions  Transaction[]
+  notifications Notification[]
+  preferences   UserPreference?
+  monthlyYields MonthlyYield[] @relation("UploadedBy")
+
+  @@index([email])
+  @@index([auth0Id])
+  @@index([role])
+  @@map("users")
 }
 
-model Vault {
+/// Investments made by users
+model Investment {
+  id            String           @id @default(uuid())
+  userId        String           @map("user_id")
+  modelConfigId String           @map("model_config_id")
+  amount        Decimal          @db.Decimal(20, 6)
+  currency      String           @default("USDT")
+  durationDays  Int              @map("duration_days")
+  status        InvestmentStatus @default(ACTIVE)
+  startDate     DateTime         @map("start_date")
+  endDate       DateTime         @map("end_date")
+  accruedYield  Decimal          @default(0) @map("accrued_yield") @db.Decimal(20, 6)
+  createdAt     DateTime         @default(now()) @map("created_at")
+  updatedAt     DateTime         @updatedAt @map("updated_at")
+
+  // Relations
+  user        User                  @relation(fields: [userId], references: [id])
+  modelConfig InvestmentModelConfig @relation(fields: [modelConfigId], references: [id])
+  yields      InvestmentYield[]
+
+  @@index([userId])
+  @@index([status])
+  @@index([modelConfigId])
+  @@map("investments")
+}
+
+/// Investment model configuration (immutable - new row on edit)
+model InvestmentModelConfig {
+  id                      String              @id @default(uuid())
+  type                    InvestmentModelType
+  name                    String
+  description             String?
+  minInvestment           Decimal             @map("min_investment") @db.Decimal(20, 6)
+  maxInvestment           Decimal?            @map("max_investment") @db.Decimal(20, 6)
+  durations               Json?               // [{days: 180, label: "6 months"}, ...]
+
+  // FIXED model only (progressive APR)
+  aprInitial              Decimal?            @map("apr_initial") @db.Decimal(5, 2)
+  aprFinal                Decimal?            @map("apr_final") @db.Decimal(5, 2)
+  aprStepPct              Decimal?            @map("apr_step_pct") @db.Decimal(5, 2)
+  aprStepPeriodDays       Int?                @map("apr_step_period_days")
+
+  // VARIABLE model only
+  profitShareInvestor     Decimal?            @map("profit_share_investor") @db.Decimal(5, 2)
+
+  // Common fields
+  withdrawalPeriod        Int?                @map("withdrawal_period")
+  earlyWithdrawalPenalty  Decimal?            @map("early_withdrawal_penalty") @db.Decimal(5, 2)
+  isCurrent               Boolean             @default(true) @map("is_current")
+  version                 Int                 @default(1)
+  createdAt               DateTime            @default(now()) @map("created_at")
+
+  // Relations
+  investments Investment[]
+
+  @@index([type])
+  @@index([isCurrent])
+  @@index([type, isCurrent])
+  @@map("investment_model_configs")
+}
+
+/// Supported blockchains
+model Blockchain {
+  id          String  @id @default(uuid())
+  name        String  @unique // Ethereum, BNB Smart Chain, Tron, Polygon, Arbitrum, Solana
+  symbol      String  @unique // ERC20, BEP20, TRC20, POLYGON, ARB, SOL
+  chainId     Int?    @map("chain_id") // EVM chain ID (1=Ethereum, 56=BSC, 137=Polygon, 42161=Arbitrum)
+  explorerUrl String? @map("explorer_url") // https://etherscan.io, https://tronscan.org, etc.
+  isActive    Boolean @default(true) @map("is_active")
+
+  // Relations
+  transactions Transaction[]
+
+  @@map("blockchains")
+}
+
+/// On-chain transactions (deposits and withdrawals)
+model Transaction {
+  id                 String            @id @default(uuid())
+  userId             String            @map("user_id")
+  blockchainId       String            @map("blockchain_id")
+  type               TransactionType
+  amount             Decimal           @db.Decimal(20, 6)
+  currency           String            @default("USDT")
+  status             TransactionStatus @default(PENDING)
+  fireblocksTxId     String?           @map("fireblocks_tx_id")
+  txHash             String?           @map("tx_hash")
+  sourceAddress      String?           @map("source_address")
+  destinationAddress String?           @map("destination_address")
+  networkFee         Decimal?          @map("network_fee") @db.Decimal(20, 6)
+  failureReason      String?           @map("failure_reason")
+  createdAt          DateTime          @default(now()) @map("created_at")
+  processedAt        DateTime?         @map("processed_at")
+  completedAt        DateTime?         @map("completed_at")
+
+  // Relations
+  user       User       @relation(fields: [userId], references: [id])
+  blockchain Blockchain @relation(fields: [blockchainId], references: [id])
+
+  @@index([userId])
+  @@index([status])
+  @@index([type])
+  @@index([fireblocksTxId])
+  @@index([blockchainId])
+  @@map("transactions")
+}
+
+/// Investment yields (per month)
+model InvestmentYield {
+  id             String       @id @default(uuid())
+  investmentId   String       @map("investment_id")
+  monthlyYieldId String?      @map("monthly_yield_id")
+  month          String       // YYYY-MM
+  grossReturn    Decimal?     @map("gross_return") @db.Decimal(5, 2)
+  activeDays     Int?         @map("active_days")
+  amount         Decimal      @db.Decimal(20, 6)
+  status         YieldStatus  @default(PENDING)
+  paidAt         DateTime?    @map("paid_at")
+  createdAt      DateTime     @default(now()) @map("created_at")
+
+  // Relations
+  investment   Investment    @relation(fields: [investmentId], references: [id])
+  monthlyYield MonthlyYield? @relation(fields: [monthlyYieldId], references: [id])
+
+  @@unique([investmentId, month])
+  @@index([investmentId])
+  @@index([month])
+  @@index([status])
+  @@index([monthlyYieldId])
+  @@map("investment_yields")
+}
+
+/// Monthly bot yields (VARIABLE model only)
+model MonthlyYield {
+  id              String             @id @default(uuid())
+  month           String             @unique // YYYY-MM
+  actualReturnPct Decimal            @map("actual_return_pct") @db.Decimal(5, 2)
+  documentUrl     String?            @map("document_url")
+  uploadedBy      String             @map("uploaded_by")
+  status          MonthlyYieldStatus @default(PENDING)
+  createdAt       DateTime           @default(now()) @map("created_at")
+  processedAt     DateTime?          @map("processed_at")
+
+  // Relations
+  uploadedByUser   User              @relation("UploadedBy", fields: [uploadedBy], references: [id])
+  investmentYields InvestmentYield[]
+
+  @@map("monthly_yields")
+}
+
+/// User notifications
+model Notification {
   id        String   @id @default(uuid())
-  userId    String   @unique
-  fireblocksVaultId String
-  name      String
-  status    VaultStatus @default(CREATING)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  userId    String   @map("user_id")
+  type      String
+  title     String
+  message   String
+  data      Json?
+  isRead    Boolean  @default(false) @map("is_read")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  // Relations
+  user User @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+  @@index([isRead])
+  @@index([createdAt(sort: Desc)])
+  @@map("notifications")
+}
+
+/// User preferences
+model UserPreference {
+  id                 String   @id @default(uuid())
+  userId             String   @unique @map("user_id")
+  emailNotifications Json     @default("{}") @map("email_notifications")
+  pushNotifications  Json     @default("{}") @map("push_notifications")
+  language           String   @default("es")
+  createdAt          DateTime @default(now()) @map("created_at")
+  updatedAt          DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  user User @relation(fields: [userId], references: [id])
+
+  @@map("user_preferences")
 }
