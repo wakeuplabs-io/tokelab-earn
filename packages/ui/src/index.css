@@ -102,30 +102,30 @@
   }
 
   /* Secondary Button States */
-  .btn-secondary {
+  .btn.btn-secondary {
     background-color: var(--color-secondary);
     color: var(--color-secondary-content);
-    border: 1px solid var(--color-primary);
+    border: 1px solid var(--color-secondary-content) !important;
   }
   
-  .btn-secondary:hover:not(:disabled) {
+  .btn.btn-secondary:hover:not(:disabled) {
     background-color: var(--color-secondary-hover);
     color: var(--color-primary-content);
-    border-color: var(--color-primary);
+    border-color: var(--color-primary-content) !important;
   }
   
-  .btn-secondary:focus-visible {
+  .btn.btn-secondary:focus-visible {
     background-color: var(--color-secondary-focus);
     color: var(--color-primary-content);
-    border-color: var(--color-secondary-focus);
+    border-color: var(--color-primary-content) !important;
     outline: 2px solid var(--color-secondary-focus);
     outline-offset: 2px;
   }
   
-  .btn-secondary:disabled {
+  .btn.btn-secondary:disabled {
     background-color: #FFFFFC;
     color: #8596AB;
-    border-color: #ECEFF2;
+    border-color: #8596AB !important;
     cursor: not-allowed;
     opacity: 1;
   }
