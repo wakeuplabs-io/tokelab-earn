@@ -3,6 +3,7 @@
  */
 
 import { InputHTMLAttributes, forwardRef } from "react";
+import clsx from "clsx";
 
 export interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
   label?: string;
@@ -20,7 +21,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
         )}
         <input
           ref={ref}
-          className={`input input-bordered w-full ${error ? "input-error" : ""} ${className}`}
+          className={clsx("input input-bordered w-full", error && "input-error", className)}
           {...props}
         />
         {error && (

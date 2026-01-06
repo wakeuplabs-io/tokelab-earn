@@ -1,5 +1,7 @@
-import { createRootRoute, Link, Outlet } from "@tanstack/react-router";
+import { createRootRoute, Outlet } from "@tanstack/react-router";
 import React from "react";
+import { Header, Sidebar, Main } from "@/components/layout";
+import { useSidebar } from "@/hooks/layout/useSidebar";
 
 const TanStackRouterDevtools =
   process.env.NODE_ENV === "production"
@@ -11,27 +13,28 @@ const TanStackRouterDevtools =
       );
 
 export const Route = createRootRoute({
-  component: () => (
-    <div className="w-screen h-screen flex flex-col">
-      <nav className="navbar bg-base-200">
-        <div className="flex-1">
-          <Link to="/" className="btn btn-ghost text-xl">
-            Web3 Custody
-          </Link>
+  component: () => {
+    const { isOpen, toggle, close } = useSidebar();
+
+    return (
+      <div className="min-h-screen bg-base-100" data-theme="tokelab">
+        <div className="flex h-screen overflow-hidden">
+          {/* Sidebar - Hidden on mobile, visible on desktop */}
+          <Sidebar isOpen={isOpen} onClose={close} />
+
+          {/* Main Content Area */}
+          <div className="flex flex-col flex-1 min-w-0 overflow-hidden">
+            {/* Header */}
+            <Header onMenuClick={toggle} />
+
+            {/* Main Content */}
+            <Main>
+              <Outlet />
+            </Main>
+          </div>
         </div>
-        <div className="flex-none gap-2">
-          <Link to="/" className="btn btn-ghost [&.active]:btn-active">
-            Home
-          </Link>
-          <Link to="/vault" className="btn btn-ghost [&.active]:btn-active">
-            Vault
-          </Link>
-        </div>
-      </nav>
-      <main className="flex flex-1 overflow-auto">
-        <Outlet />
-      </main>
-      <TanStackRouterDevtools />
-    </div>
-  ),
+        <TanStackRouterDevtools />
+      </div>
+    );
+  },
 });
