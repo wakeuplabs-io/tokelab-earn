@@ -129,6 +129,52 @@
     cursor: not-allowed;
     opacity: 1;
   }
+
+  /* Input States */
+  .input {
+    transition: all 0.2s ease-in-out;
+  }
+
+  .input:hover:not(:disabled):not(:focus) {
+    background-color: #F6F7F9;
+  }
+
+  .input:focus {
+    border-color: #535EFF;
+    box-shadow: 0 0 0 3px rgba(83, 94, 255, 0.1);
+  }
+
+  .input-error {
+    border-color: #B00020;
+    color: #B00020;
+  }
+
+  .input-error::placeholder {
+    color: #B00020;
+  }
+
+  .input-error:hover:not(:disabled):not(:focus) {
+    background-color: #FFFFFC;
+    border-color: #B00020;
+  }
+
+  .input-success {
+    border-color: #57CC99;
+    color: #57CC99;
+  }
+
+  .input-success::placeholder {
+    color: #57CC99;
+  }
+
+  .input-success:hover:not(:disabled):not(:focus) {
+    background-color: #FFFFFC;
+    border-color: #57CC99;
+  }
+
+  .input:disabled {
+    cursor: not-allowed;
+  }
 }
 
 @layer base {
