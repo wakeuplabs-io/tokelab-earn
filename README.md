@@ -4,7 +4,7 @@
 
 ```bash
 npm install
-npm run db:setup   # Levanta Docker + migra + seed (si DB vacía)
+npm run db:setup   # Starts Docker, runs migrations, and seeds if the DB is empty
 npm run dev
 ```
 
