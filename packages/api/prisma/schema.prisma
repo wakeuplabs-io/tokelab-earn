@@ -141,6 +141,7 @@ model InvestmentModelConfig {
   aprFinal                Decimal?            @map("apr_final") @db.Decimal(5, 2)
   aprStepPct              Decimal?            @map("apr_step_pct") @db.Decimal(5, 2)
   aprStepPeriodDays       Int?                @map("apr_step_period_days")
+  claimPeriodDays         Int?                @map("claim_period_days") // Days between claim windows (e.g., 60)
 
   // VARIABLE model only
   profitShareInvestor     Decimal?            @map("profit_share_investor") @db.Decimal(5, 2)
