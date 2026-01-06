@@ -3,14 +3,31 @@
  */
 
 import { HTMLAttributes, ReactNode } from "react";
+import clsx from "clsx";
 
 export interface CardProps extends HTMLAttributes<HTMLDivElement> {
   children: ReactNode;
+  variant?: "default" | "bordered" | "compact";
+  shadow?: "none" | "sm" | "md" | "lg" | "xl";
 }
 
-export function Card({ children, className = "", ...props }: CardProps) {
+export function Card({ children, className = "", variant = "default", shadow = "xl", ...props }: CardProps) {
+  const variantClasses = {
+    default: "bg-base-100",
+    bordered: "bg-base-100 border border-base-300",
+    compact: "bg-base-100",
+  };
+
+  const shadowClasses = {
+    none: "",
+    sm: "shadow-sm",
+    md: "shadow-md",
+    lg: "shadow-lg",
+    xl: "shadow-xl",
+  };
+
   return (
-    <div className={`card bg-base-100 shadow-xl ${className}`} {...props}>
+    <div className={clsx("card p-6", variantClasses[variant], shadowClasses[shadow], className)} {...props}>
       {children}
     </div>
   );
@@ -23,7 +40,7 @@ export function CardHeader({
   children: ReactNode;
   className?: string;
 }) {
-  return <div className={`card-header ${className}`}>{children}</div>;
+  return <div className={clsx("card-header", className)}>{children}</div>;
 }
 
 export function CardTitle({
@@ -33,7 +50,7 @@ export function CardTitle({
   children: ReactNode;
   className?: string;
 }) {
-  return <h2 className={`card-title ${className}`}>{children}</h2>;
+  return <h2 className={clsx("card-title", className)}>{children}</h2>;
 }
 
 export function CardBody({
@@ -43,7 +60,7 @@ export function CardBody({
   children: ReactNode;
   className?: string;
 }) {
-  return <div className={`card-body ${className}`}>{children}</div>;
+  return <div className={clsx("card-body", className)}>{children}</div>;
 }
 
 export function CardFooter({
@@ -53,5 +70,5 @@ export function CardFooter({
   children: ReactNode;
   className?: string;
 }) {
-  return <div className={`card-footer ${className}`}>{children}</div>;
+  return <div className={clsx("card-footer", className)}>{children}</div>;
 }
