@@ -3,14 +3,14 @@
  * Admin page for viewing all investments with filters and pagination
  */
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useInvestments } from "../../hooks/api/useInvestments";
-import { useDebounce, usePagination } from "../../hooks/utils";
-import { Input } from "../../components/ui/input";
+import { usePagination } from "../../hooks/utils";
+import { SearchInput } from "../../components/ui/search-input";
+import { SelectFilter } from "../../components/ui/select-filter";
 import { DataTable, type DataTableColumn } from "../../components/ui/data-table";
 import { StatusBadge, type DotColor } from "../../components/ui/status-badge";
 import { DateRangeFilter, type DateRange } from "../../components/ui/date-range-filter";
-import { HiOutlineSearch } from "react-icons/hi";
 import { formatDate, formatNumber } from "../../lib/format";
 import type {
   InvestmentStatus,
@@ -43,18 +43,17 @@ export function InvestmentHistoryPage() {
   const [modelType, setModelType] = useState<InvestmentModelType | "">("");
   const [dateRange, setDateRange] = useState<DateRange>({ from: null, to: null });
 
-  const debouncedSearch = useDebounce(search, 500);
   const { page, limit, setPage, resetPage, getPagination } = usePagination({ limit: 10 });
 
-  // Reset page when search changes
-  useEffect(() => {
+  const handleSearch = (value: string) => {
+    setSearch(value);
     resetPage();
-  }, [debouncedSearch, resetPage]);
+  };
 
   const { data, isLoading, error, refetch } = useInvestments({
     page,
     limit,
-    search: debouncedSearch || undefined,
+    search: search || undefined,
     status: status || undefined,
     modelType: modelType || undefined,
     dateFrom: dateRange.from || undefined,
@@ -66,13 +65,13 @@ export function InvestmentHistoryPage() {
     resetPage();
   };
 
-  const handleStatusChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setStatus(e.target.value as InvestmentStatus | "");
+  const handleStatusChange = (value: InvestmentStatus | "") => {
+    setStatus(value);
     resetPage();
   };
 
-  const handleModelTypeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setModelType(e.target.value as InvestmentModelType | "");
+  const handleModelTypeChange = (value: InvestmentModelType | "") => {
+    setModelType(value);
     resetPage();
   };
 
@@ -169,11 +168,10 @@ export function InvestmentHistoryPage() {
     <div className="space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div className="w-[280px]">
-          <Input
+          <SearchInput
             placeholder="Buscar..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            iconLeft={<HiOutlineSearch className="w-5 h-5" />}
+            onSearch={handleSearch}
+            debounceDelay={500}
           />
         </div>
 
@@ -184,26 +182,26 @@ export function InvestmentHistoryPage() {
             placeholder="Filtrar por fecha"
           />
 
-          <select
-            className="select select-bordered select-sm"
+          <SelectFilter<InvestmentStatus>
             value={status}
             onChange={handleStatusChange}
-          >
-            <option value="">Filtrar por estado</option>
-            <option value="ACTIVE">Activo</option>
-            <option value="COMPLETED">Finalizado</option>
-            <option value="CANCELLED">Cancelado</option>
-          </select>
+            placeholder="Filtrar por estado"
+            options={[
+              { value: "ACTIVE", label: "Activo" },
+              { value: "COMPLETED", label: "Finalizado" },
+              { value: "CANCELLED", label: "Cancelado" },
+            ]}
+          />
 
-          <select
-            className="select select-bordered select-sm"
+          <SelectFilter<InvestmentModelType>
             value={modelType}
             onChange={handleModelTypeChange}
-          >
-            <option value="">Filtrar por modelo</option>
-            <option value="FIXED">Fijo</option>
-            <option value="VARIABLE">Variable</option>
-          </select>
+            placeholder="Filtrar por modelo"
+            options={[
+              { value: "FIXED", label: "Fijo" },
+              { value: "VARIABLE", label: "Variable" },
+            ]}
+          />
         </div>
       </div>
 
