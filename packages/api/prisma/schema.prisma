@@ -291,9 +291,7 @@ model Notification {
   id        String              @id @default(uuid())
   userId    String
   channel   NotificationChannel
-  type      String
-  title     String
-  message   String
+  templateId String
   data      Json?
   isRead    Boolean             @default(false)
   createdAt DateTime            @default(now())
