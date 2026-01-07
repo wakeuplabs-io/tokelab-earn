@@ -5,6 +5,7 @@
 
 import { useState, useEffect } from "react";
 import { useInvestments } from "../../hooks/api/useInvestments";
+import { useDebounce, usePagination } from "../../hooks/utils";
 import { Input } from "../../components/ui/input";
 import { DataTable, type DataTableColumn } from "../../components/ui/data-table";
 import { StatusBadge, type DotColor } from "../../components/ui/status-badge";
@@ -37,25 +38,22 @@ function getModelTypeLabel(modelType: InvestmentModelType): string {
 }
 
 export function InvestmentHistoryPage() {
-  const [page, setPage] = useState(1);
   const [search, setSearch] = useState("");
-  const [debouncedSearch, setDebouncedSearch] = useState("");
   const [status, setStatus] = useState<InvestmentStatus | "">("");
   const [modelType, setModelType] = useState<InvestmentModelType | "">("");
   const [dateRange, setDateRange] = useState<DateRange>({ from: null, to: null });
 
-  // Debounce search input
+  const debouncedSearch = useDebounce(search, 500);
+  const { page, limit, setPage, resetPage, getPagination } = usePagination({ limit: 10 });
+
+  // Reset page when search changes
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setDebouncedSearch(search);
-      setPage(1);
-    }, 500);
-    return () => clearTimeout(timer);
-  }, [search]);
+    resetPage();
+  }, [debouncedSearch, resetPage]);
 
   const { data, isLoading, error, refetch } = useInvestments({
     page,
-    limit: 10,
+    limit,
     search: debouncedSearch || undefined,
     status: status || undefined,
     modelType: modelType || undefined,
@@ -65,21 +63,21 @@ export function InvestmentHistoryPage() {
 
   const handleDateRangeChange = (range: DateRange) => {
     setDateRange(range);
-    setPage(1);
+    resetPage();
   };
 
   const handleStatusChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setStatus(e.target.value as InvestmentStatus | "");
-    setPage(1);
+    resetPage();
   };
 
   const handleModelTypeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setModelType(e.target.value as InvestmentModelType | "");
-    setPage(1);
+    resetPage();
   };
 
   const investments = data?.data ?? [];
-  const pagination = data?.pagination ?? { total: 0, page: 1, limit: 10, pages: 0 };
+  const pagination = getPagination(data);
 
   const columns: DataTableColumn<Investment>[] = [
     {
