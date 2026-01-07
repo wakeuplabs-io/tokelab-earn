@@ -992,13 +992,12 @@ async function seedInvestmentYields(
 async function seedNotifications(users: Awaited<ReturnType<typeof seedUsers>>) {
   console.log("Seeding notifications...");
 
+  // Template IDs reference templates stored in the backend
   const notifications = [
     {
       userId: users.investor1.id,
       channel: "IN_APP" as const,
-      type: "deposit_confirmed",
-      title: "Deposit Confirmed",
-      message: "Your deposit of 20,000 USDT has been confirmed.",
+      templateId: "deposit_confirmed",
       data: { amount: 20000, currency: "USDT", blockchain: "Ethereum" },
       isRead: true,
       createdAt: daysAgo(100),
@@ -1006,9 +1005,7 @@ async function seedNotifications(users: Awaited<ReturnType<typeof seedUsers>>) {
     {
       userId: users.investor1.id,
       channel: "IN_APP" as const,
-      type: "investment_created",
-      title: "Investment Created",
-      message: "Your investment of 10,000 USDT in Fixed APR has been created.",
+      templateId: "investment_created",
       data: { amount: 10000, model: "FIXED", duration: 365 },
       isRead: true,
       createdAt: daysAgo(90),
@@ -1016,9 +1013,7 @@ async function seedNotifications(users: Awaited<ReturnType<typeof seedUsers>>) {
     {
       userId: users.investor1.id,
       channel: "EMAIL" as const,
-      type: "yield_available",
-      title: "Yield Available",
-      message: "You have 504 USDT in yield ready to claim.",
+      templateId: "yield_available",
       data: { amount: 504, month: "2024-10" },
       isRead: true,
       createdAt: daysAgo(30),
@@ -1026,9 +1021,7 @@ async function seedNotifications(users: Awaited<ReturnType<typeof seedUsers>>) {
     {
       userId: users.investor1.id,
       channel: "IN_APP" as const,
-      type: "withdrawal_completed",
-      title: "Withdrawal Completed",
-      message: "Your withdrawal of 5,000 USDT has been completed.",
+      templateId: "withdrawal_completed",
       data: { amount: 5000, currency: "USDT", txHash: "0xdef456..." },
       isRead: false,
       createdAt: daysAgo(30),
@@ -1036,9 +1029,7 @@ async function seedNotifications(users: Awaited<ReturnType<typeof seedUsers>>) {
     {
       userId: users.investor2.id,
       channel: "EMAIL" as const,
-      type: "kyc_in_progress",
-      title: "KYC Verification Started",
-      message: "Your identity verification is being processed.",
+      templateId: "kyc_in_progress",
       data: { status: "IN_PROGRESS" },
       isRead: true,
       createdAt: daysAgo(50),
@@ -1046,9 +1037,7 @@ async function seedNotifications(users: Awaited<ReturnType<typeof seedUsers>>) {
     {
       userId: users.investor1.id,
       channel: "IN_APP" as const,
-      type: "system_announcement",
-      title: "New Feature: Variable Model",
-      message: "We have launched a new Variable investment model with 60% profit sharing!",
+      templateId: "system_announcement",
       data: { feature: "variable_model" },
       isRead: false,
       createdAt: daysAgo(60),
@@ -1056,9 +1045,7 @@ async function seedNotifications(users: Awaited<ReturnType<typeof seedUsers>>) {
     {
       userId: users.investor4.id,
       channel: "EMAIL" as const,
-      type: "account_blocked",
-      title: "Account Blocked",
-      message: "Your account has been blocked. Please contact support.",
+      templateId: "account_blocked",
       data: { reason: "suspicious_activity" },
       isRead: false,
       createdAt: daysAgo(10),
@@ -1066,9 +1053,7 @@ async function seedNotifications(users: Awaited<ReturnType<typeof seedUsers>>) {
     {
       userId: users.investor1.id,
       channel: "IN_APP" as const,
-      type: "yield_claimed",
-      title: "Yield Claimed",
-      message: "Your yield of 456 USDT has been credited to your balance.",
+      templateId: "yield_claimed",
       data: { amount: 456, month: "2024-11" },
       isRead: false,
       createdAt: daysAgo(2),

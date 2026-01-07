@@ -301,6 +301,7 @@ model Notification {
 
   @@index([userId])
   @@index([channel])
+  @@index([templateId])
   @@index([isRead])
   @@index([createdAt(sort: Desc)])
 }
