@@ -99,9 +99,7 @@ export function InvestmentHistoryPage() {
 
   return (
     <div className="space-y-6">
-      {/* Header with filters */}
       <div className="flex flex-wrap items-center justify-between gap-4">
-        {/* Search - Left side */}
         <div className="w-[280px]">
           <Input
             placeholder="Buscar..."
@@ -111,15 +109,12 @@ export function InvestmentHistoryPage() {
           />
         </div>
 
-        {/* Filters - Right side */}
         <div className="flex items-center gap-3">
-          {/* Date picker placeholder */}
           <Button variant="outline" size="sm">
             <HiOutlineCalendar className="w-5 h-5 mr-2" />
             Filtrar por fecha
           </Button>
 
-          {/* Status filter */}
           <select
             className="select select-bordered select-sm"
             value={status}
@@ -131,7 +126,6 @@ export function InvestmentHistoryPage() {
             <option value="CANCELLED">Cancelado</option>
           </select>
 
-          {/* Model type filter */}
           <select
             className="select select-bordered select-sm"
             value={modelType}
@@ -144,7 +138,6 @@ export function InvestmentHistoryPage() {
         </div>
       </div>
 
-      {/* Table */}
       <Card className="overflow-hidden">
         <CardBody className="p-0">
           {isLoading ? (
