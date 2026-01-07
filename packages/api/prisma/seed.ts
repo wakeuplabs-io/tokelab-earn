@@ -147,9 +147,6 @@ async function seedUsers() {
       kycStatus: "VERIFIED",
       kycProviderId: "sumsub_admin_001",
       fireblocksVaultId: "vault_admin_001",
-      depositAddress: "0xAdminDepositAddress1234567890123456789012",
-      availableBalance: new Decimal("0"),
-      lockedBalance: new Decimal("0"),
       isBlocked: false,
     },
   });
@@ -166,9 +163,6 @@ async function seedUsers() {
       kycStatus: "VERIFIED",
       kycProviderId: "sumsub_inv_001",
       fireblocksVaultId: "vault_inv_001",
-      depositAddress: "0xInvestor1DepositAddress12345678901234567890",
-      availableBalance: new Decimal("15000.000000"),
-      lockedBalance: new Decimal("35000.000000"),
       isBlocked: false,
     },
   });
@@ -185,9 +179,6 @@ async function seedUsers() {
       kycStatus: "IN_PROGRESS",
       kycProviderId: "sumsub_inv_002",
       fireblocksVaultId: "vault_inv_002",
-      depositAddress: "0xInvestor2DepositAddress12345678901234567890",
-      availableBalance: new Decimal("5000.000000"),
-      lockedBalance: new Decimal("10000.000000"),
       isBlocked: false,
     },
   });
@@ -204,9 +195,6 @@ async function seedUsers() {
       kycStatus: "NOT_STARTED",
       kycProviderId: null,
       fireblocksVaultId: "vault_inv_003",
-      depositAddress: "0xInvestor3DepositAddress12345678901234567890",
-      availableBalance: new Decimal("1000.000000"),
-      lockedBalance: new Decimal("0"),
       isBlocked: false,
     },
   });
@@ -223,15 +211,112 @@ async function seedUsers() {
       kycStatus: "VERIFIED",
       kycProviderId: "sumsub_inv_004",
       fireblocksVaultId: "vault_inv_004",
-      depositAddress: "0xInvestor4DepositAddress12345678901234567890",
-      availableBalance: new Decimal("0"),
-      lockedBalance: new Decimal("0"),
       isBlocked: true, // Blocked user
     },
   });
 
   console.log("  ✓ Created 5 users (1 admin + 4 investors)");
   return { admin, investor1, investor2, investor3, investor4 };
+}
+
+async function seedUserBalances(users: Awaited<ReturnType<typeof seedUsers>>) {
+  console.log("Seeding user balances...");
+
+  const balances = [
+    // Investor1 - has available and locked USDT
+    {
+      userId: users.investor1.id,
+      currency: "USDT" as const,
+      available: new Decimal("15000.000000"),
+      locked: new Decimal("35000.000000"),
+    },
+    // Investor1 - also has some USDC
+    {
+      userId: users.investor1.id,
+      currency: "USDC" as const,
+      available: new Decimal("2500.000000"),
+      locked: new Decimal("0"),
+    },
+    // Investor2
+    {
+      userId: users.investor2.id,
+      currency: "USDT" as const,
+      available: new Decimal("5000.000000"),
+      locked: new Decimal("10000.000000"),
+    },
+    // Investor3
+    {
+      userId: users.investor3.id,
+      currency: "USDT" as const,
+      available: new Decimal("1000.000000"),
+      locked: new Decimal("19500.000000"),
+    },
+    // Investor4 (blocked)
+    {
+      userId: users.investor4.id,
+      currency: "USDT" as const,
+      available: new Decimal("0"),
+      locked: new Decimal("0"),
+    },
+  ];
+
+  for (const balance of balances) {
+    await prisma.userBalance.create({ data: balance });
+  }
+
+  console.log(`  ✓ Created ${balances.length} user balances`);
+}
+
+async function seedUserDepositAddresses(users: Awaited<ReturnType<typeof seedUsers>>) {
+  console.log("Seeding user deposit addresses...");
+
+  const addresses = [
+    // Investor1 - ETH and BSC addresses
+    {
+      userId: users.investor1.id,
+      blockchainId: IDS.BLOCKCHAIN_ETH,
+      address: "0xInvestor1DepositAddress12345678901234567890",
+    },
+    {
+      userId: users.investor1.id,
+      blockchainId: IDS.BLOCKCHAIN_BSC,
+      address: "0xInvestor1BSCAddress123456789012345678901234",
+    },
+    {
+      userId: users.investor1.id,
+      blockchainId: IDS.BLOCKCHAIN_ARBITRUM,
+      address: "0xInvestor1ArbAddress1234567890123456789012345",
+    },
+    {
+      userId: users.investor1.id,
+      blockchainId: IDS.BLOCKCHAIN_SOLANA,
+      address: "SolInvestor1Deposit123456789012345678901234",
+    },
+    // Investor2
+    {
+      userId: users.investor2.id,
+      blockchainId: IDS.BLOCKCHAIN_TRON,
+      address: "TInvestor2Deposit12345678901234567890123",
+    },
+    // Investor3
+    {
+      userId: users.investor3.id,
+      blockchainId: IDS.BLOCKCHAIN_POLYGON,
+      address: "0xInvestor3PolygonAddress12345678901234567890",
+    },
+    // Investor4
+    {
+      userId: users.investor4.id,
+      blockchainId: IDS.BLOCKCHAIN_ETH,
+      address: "0xInvestor4DepositAddress12345678901234567890",
+    },
+  ];
+
+  for (const addr of addresses) {
+    await prisma.userDepositAddress.create({ data: addr });
+  }
+
+  console.log(`  ✓ Created ${addresses.length} user deposit addresses`);
 }
 
 async function seedInvestmentModelConfigs() {
@@ -245,11 +330,7 @@ async function seedInvestmentModelConfigs() {
       description: "Earn progressive APR starting at 8% and increasing to 12% over time",
       minInvestment: new Decimal("100.000000"),
       maxInvestment: new Decimal("100000.000000"),
-      durations: [
-        { days: 180, label: "6 months" },
-        { days: 365, label: "1 year" },
-        { days: 730, label: "2 years" },
-      ],
+      durationDays: 365,
       aprInitial: new Decimal("8.00"),
       aprFinal: new Decimal("12.00"),
       aprStepPct: new Decimal("1.00"),
@@ -271,11 +352,7 @@ async function seedInvestmentModelConfigs() {
       description: "Earn 60% of the trading bot profits each month",
       minInvestment: new Decimal("500.000000"),
       maxInvestment: null,
-      durations: [
-        { days: 90, label: "3 months" },
-        { days: 180, label: "6 months" },
-        { days: 365, label: "1 year" },
-      ],
+      durationDays: 365,
       aprInitial: null,
       aprFinal: null,
       aprStepPct: null,
@@ -309,7 +386,6 @@ async function seedInvestments(
         modelConfigId: models.fixedModel.id,
         amount: new Decimal("10000.000000"),
         currency: "USDT",
-        durationDays: 365,
         status: "ACTIVE",
         startDate: daysAgo(90),
         endDate: daysFromNow(275),
@@ -327,10 +403,9 @@ async function seedInvestments(
         modelConfigId: models.fixedModel.id,
         amount: new Decimal("5000.000000"),
         currency: "USDT",
-        durationDays: 180,
         status: "ACTIVE",
         startDate: daysAgo(30),
-        endDate: daysFromNow(150),
+        endDate: daysFromNow(335),
         accruedYield: new Decimal("33.333333"),
       },
     }),
@@ -345,7 +420,6 @@ async function seedInvestments(
         modelConfigId: models.variableModel.id,
         amount: new Decimal("20000.000000"),
         currency: "USDT",
-        durationDays: 365,
         status: "ACTIVE",
         startDate: daysAgo(60),
         endDate: daysFromNow(305),
@@ -363,9 +437,8 @@ async function seedInvestments(
         modelConfigId: models.fixedModel.id,
         amount: new Decimal("3000.000000"),
         currency: "USDT",
-        durationDays: 180,
         status: "COMPLETED",
-        startDate: daysAgo(195),
+        startDate: daysAgo(380),
         endDate: daysAgo(15),
         accruedYield: new Decimal("150.000000"),
       },
@@ -381,7 +454,6 @@ async function seedInvestments(
         modelConfigId: models.fixedModel.id,
         amount: new Decimal("10000.000000"),
         currency: "USDT",
-        durationDays: 365,
         status: "ACTIVE",
         startDate: daysAgo(45),
         endDate: daysFromNow(320),
@@ -399,7 +471,6 @@ async function seedInvestments(
         modelConfigId: models.fixedModel.id,
         amount: new Decimal("2000.000000"),
         currency: "USDT",
-        durationDays: 180,
         status: "CANCELLED",
         startDate: daysAgo(60),
         endDate: daysAgo(30), // Cancelled early
@@ -417,7 +488,6 @@ async function seedInvestments(
         modelConfigId: models.fixedModel.id,
         amount: new Decimal("8000.000000"),
         currency: "USDT",
-        durationDays: 365,
         status: "ACTIVE",
         startDate: daysAgo(120),
         endDate: daysFromNow(245),
@@ -435,7 +505,6 @@ async function seedInvestments(
         modelConfigId: models.fixedModel.id,
         amount: new Decimal("15000.000000"),
         currency: "USDT",
-        durationDays: 365,
         status: "ACTIVE",
         startDate: daysAgo(180),
         endDate: daysFromNow(185),
@@ -453,7 +522,6 @@ async function seedInvestments(
         modelConfigId: models.variableModel.id,
         amount: new Decimal("25000.000000"),
         currency: "USDT",
-        durationDays: 365,
         status: "ACTIVE",
         startDate: daysAgo(150),
         endDate: daysFromNow(215),
@@ -471,7 +539,6 @@ async function seedInvestments(
         modelConfigId: models.variableModel.id,
         amount: new Decimal("12000.000000"),
         currency: "USDT",
-        durationDays: 365,
         status: "ACTIVE",
         startDate: daysAgo(200),
         endDate: daysFromNow(165),
@@ -489,7 +556,6 @@ async function seedInvestments(
         modelConfigId: models.fixedModel.id,
         amount: new Decimal("4000.000000"),
         currency: "USDT",
-        durationDays: 365,
         status: "COMPLETED",
         startDate: daysAgo(400),
         endDate: daysAgo(35),
@@ -507,9 +573,8 @@ async function seedInvestments(
         modelConfigId: models.fixedModel.id,
         amount: new Decimal("6000.000000"),
         currency: "USDT",
-        durationDays: 180,
         status: "COMPLETED",
-        startDate: daysAgo(250),
+        startDate: daysAgo(435),
         endDate: daysAgo(70),
         accruedYield: new Decimal("240.000000"),
       },
@@ -525,7 +590,6 @@ async function seedInvestments(
         modelConfigId: models.variableModel.id,
         amount: new Decimal("18000.000000"),
         currency: "USDT",
-        durationDays: 365,
         status: "COMPLETED",
         startDate: daysAgo(450),
         endDate: daysAgo(85),
@@ -543,7 +607,6 @@ async function seedInvestments(
         modelConfigId: models.fixedModel.id,
         amount: new Decimal("3500.000000"),
         currency: "USDT",
-        durationDays: 180,
         status: "CANCELLED",
         startDate: daysAgo(100),
         endDate: daysAgo(50),
@@ -561,10 +624,9 @@ async function seedInvestments(
         modelConfigId: models.fixedModel.id,
         amount: new Decimal("7500.000000"),
         currency: "USDT",
-        durationDays: 180,
         status: "ACTIVE",
         startDate: daysAgo(75),
-        endDate: daysFromNow(105),
+        endDate: daysFromNow(290),
         accruedYield: new Decimal("125.000000"),
       },
     }),
@@ -574,11 +636,7 @@ async function seedInvestments(
   return investments;
 }
 
-async function seedTransactions(
-  users: Awaited<ReturnType<typeof seedUsers>>,
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  _blockchains: Awaited<ReturnType<typeof seedBlockchains>>,
-) {
+async function seedTransactions(users: Awaited<ReturnType<typeof seedUsers>>) {
   console.log("Seeding transactions...");
 
   const transactions = [
@@ -593,7 +651,7 @@ async function seedTransactions(
       fireblocksTxId: "fb_tx_001",
       txHash: "0xabc123def456789012345678901234567890123456789012345678901234567890",
       sourceAddress: "0xExternalWallet1234567890123456789012345678",
-      destinationAddress: users.investor1.depositAddress,
+      destinationAddress: "0xInvestor1DepositAddress12345678901234567890",
       networkFee: new Decimal("5.500000"),
       createdAt: daysAgo(100),
       processedAt: daysAgo(100),
@@ -610,7 +668,7 @@ async function seedTransactions(
       fireblocksTxId: "fb_tx_002",
       txHash: "0xbcd234567890123456789012345678901234567890123456789012345678901234",
       sourceAddress: "0xExternalWallet2345678901234567890123456789",
-      destinationAddress: users.investor1.depositAddress,
+      destinationAddress: "0xInvestor1BSCAddress123456789012345678901234",
       networkFee: new Decimal("0.500000"),
       createdAt: daysAgo(95),
       processedAt: daysAgo(95),
@@ -644,7 +702,7 @@ async function seedTransactions(
       fireblocksTxId: "fb_tx_004",
       txHash: "0xcde345678901234567890123456789012345678901234567890123456789012345",
       sourceAddress: "0xExternalWallet3456789012345678901234567890",
-      destinationAddress: users.investor3.depositAddress,
+      destinationAddress: "0xInvestor3PolygonAddress12345678901234567890",
       networkFee: new Decimal("0.100000"),
       createdAt: daysAgo(20),
       processedAt: daysAgo(20),
@@ -660,7 +718,7 @@ async function seedTransactions(
       status: "COMPLETED" as const,
       fireblocksTxId: "fb_tx_005",
       txHash: "0xdef456789012345678901234567890123456789012345678901234567890123456",
-      sourceAddress: users.investor1.depositAddress,
+      sourceAddress: "0xInvestor1DepositAddress12345678901234567890",
       destinationAddress: "0xExternalWithdrawal123456789012345678901234",
       networkFee: new Decimal("8.000000"),
       createdAt: daysAgo(30),
@@ -677,7 +735,7 @@ async function seedTransactions(
       status: "COMPLETED" as const,
       fireblocksTxId: "fb_tx_006",
       txHash: "0xefg567890123456789012345678901234567890123456789012345678901234567",
-      sourceAddress: users.investor1.depositAddress,
+      sourceAddress: "0xInvestor1BSCAddress123456789012345678901234",
       destinationAddress: "0xExternalWithdrawal234567890123456789012345",
       networkFee: new Decimal("0.300000"),
       createdAt: daysAgo(15),
@@ -695,7 +753,7 @@ async function seedTransactions(
       fireblocksTxId: "fb_tx_007",
       txHash: null,
       sourceAddress: "0xExternalWallet4567890123456789012345678901",
-      destinationAddress: users.investor1.depositAddress,
+      destinationAddress: "0xInvestor1ArbAddress1234567890123456789012345",
       networkFee: null,
       createdAt: daysAgo(1),
       processedAt: null,
@@ -728,7 +786,7 @@ async function seedTransactions(
       status: "FAILED" as const,
       fireblocksTxId: "fb_tx_009",
       txHash: null,
-      sourceAddress: users.investor4.depositAddress,
+      sourceAddress: "0xInvestor4DepositAddress12345678901234567890",
       destinationAddress: "0xExternalWithdrawal345678901234567890123456",
       networkFee: null,
       failureReason: "User account is blocked",
@@ -809,8 +867,6 @@ async function seedMonthlyYields(admin: { id: string }) {
 async function seedInvestmentYields(
   investments: Awaited<ReturnType<typeof seedInvestments>>,
   monthlyYields: Awaited<ReturnType<typeof seedMonthlyYields>>,
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  _models: Awaited<ReturnType<typeof seedInvestmentModelConfigs>>,
 ) {
   console.log("Seeding investment yields...");
 
@@ -819,7 +875,7 @@ async function seedInvestmentYields(
   // VARIABLE investment yields (linked to monthly yields)
   const variableInvestment = investments.find((i) => i.id === IDS.INV_VARIABLE_ACTIVE);
   if (variableInvestment) {
-    // Month 1 yield (processed)
+    // Month 1 yield (claimed)
     yields.push({
       investmentId: variableInvestment.id,
       monthlyYieldId: IDS.MONTHLY_YIELD_1,
@@ -827,11 +883,11 @@ async function seedInvestmentYields(
       grossReturn: new Decimal("4.20"),
       activeDays: 30,
       amount: new Decimal("504.000000"), // 20000 * 4.20% * 60% = 504
-      status: "PAID" as const,
-      paidAt: daysAgo(25),
+      status: "CLAIMED" as const,
+      claimedAt: daysAgo(25),
     });
 
-    // Month 2 yield (processed)
+    // Month 2 yield (claimed)
     yields.push({
       investmentId: variableInvestment.id,
       monthlyYieldId: IDS.MONTHLY_YIELD_2,
@@ -839,8 +895,8 @@ async function seedInvestmentYields(
       grossReturn: new Decimal("3.80"),
       activeDays: 30,
       amount: new Decimal("456.000000"), // 20000 * 3.80% * 60% = 456
-      status: "PAID" as const,
-      paidAt: daysAgo(2),
+      status: "CLAIMED" as const,
+      claimedAt: daysAgo(2),
     });
 
     // Month 3 yield (pending)
@@ -852,7 +908,7 @@ async function seedInvestmentYields(
       activeDays: 15, // Partial month
       amount: new Decimal("306.000000"), // 20000 * 5.10% * 60% * 0.5 = 306
       status: "PENDING" as const,
-      paidAt: null,
+      claimedAt: null,
     });
   }
 
@@ -867,8 +923,8 @@ async function seedInvestmentYields(
       grossReturn: new Decimal("8.00"),
       activeDays: 30,
       amount: new Decimal("65.753425"), // 10000 * 8% / 365 * 30
-      status: "PAID" as const,
-      paidAt: daysAgo(60),
+      status: "CLAIMED" as const,
+      claimedAt: daysAgo(60),
     });
 
     // Month 2 (9% APR - after first step)
@@ -879,8 +935,8 @@ async function seedInvestmentYields(
       grossReturn: new Decimal("9.00"),
       activeDays: 30,
       amount: new Decimal("73.972603"), // 10000 * 9% / 365 * 30
-      status: "PAID" as const,
-      paidAt: daysAgo(30),
+      status: "CLAIMED" as const,
+      claimedAt: daysAgo(30),
     });
 
     // Month 3 (10% APR - after second step)
@@ -892,7 +948,7 @@ async function seedInvestmentYields(
       activeDays: 15,
       amount: new Decimal("41.095890"), // 10000 * 10% / 365 * 15
       status: "PENDING" as const,
-      paidAt: null,
+      claimedAt: null,
     });
   }
 
@@ -907,11 +963,11 @@ async function seedInvestmentYields(
       activeDays: 30,
       amount: new Decimal("32.876712"), // 5000 * 8% / 365 * 30
       status: "PENDING" as const,
-      paidAt: null,
+      claimedAt: null,
     });
   }
 
-  // Completed investment - all yields paid
+  // Completed investment - all yields claimed
   const completedInvestment = investments.find((i) => i.id === IDS.INV_FIXED_COMPLETED);
   if (completedInvestment) {
     yields.push({
@@ -921,8 +977,8 @@ async function seedInvestmentYields(
       grossReturn: new Decimal("8.00"),
       activeDays: 30,
       amount: new Decimal("19.726027"),
-      status: "PAID" as const,
-      paidAt: daysAgo(150),
+      status: "CLAIMED" as const,
+      claimedAt: daysAgo(150),
     });
   }
 
@@ -939,6 +995,7 @@ async function seedNotifications(users: Awaited<ReturnType<typeof seedUsers>>) {
   const notifications = [
     {
       userId: users.investor1.id,
+      channel: "IN_APP" as const,
       type: "deposit_confirmed",
       title: "Deposit Confirmed",
       message: "Your deposit of 20,000 USDT has been confirmed.",
@@ -948,6 +1005,7 @@ async function seedNotifications(users: Awaited<ReturnType<typeof seedUsers>>) {
     },
     {
       userId: users.investor1.id,
+      channel: "IN_APP" as const,
       type: "investment_created",
       title: "Investment Created",
       message: "Your investment of 10,000 USDT in Fixed APR has been created.",
@@ -957,6 +1015,7 @@ async function seedNotifications(users: Awaited<ReturnType<typeof seedUsers>>) {
     },
     {
       userId: users.investor1.id,
+      channel: "EMAIL" as const,
       type: "yield_available",
       title: "Yield Available",
       message: "You have 504 USDT in yield ready to claim.",
@@ -966,6 +1025,7 @@ async function seedNotifications(users: Awaited<ReturnType<typeof seedUsers>>) {
     },
     {
       userId: users.investor1.id,
+      channel: "IN_APP" as const,
       type: "withdrawal_completed",
       title: "Withdrawal Completed",
       message: "Your withdrawal of 5,000 USDT has been completed.",
@@ -975,6 +1035,7 @@ async function seedNotifications(users: Awaited<ReturnType<typeof seedUsers>>) {
     },
     {
       userId: users.investor2.id,
+      channel: "EMAIL" as const,
       type: "kyc_in_progress",
       title: "KYC Verification Started",
       message: "Your identity verification is being processed.",
@@ -984,6 +1045,7 @@ async function seedNotifications(users: Awaited<ReturnType<typeof seedUsers>>) {
     },
     {
       userId: users.investor1.id,
+      channel: "IN_APP" as const,
       type: "system_announcement",
       title: "New Feature: Variable Model",
       message: "We have launched a new Variable investment model with 60% profit sharing!",
@@ -993,6 +1055,7 @@ async function seedNotifications(users: Awaited<ReturnType<typeof seedUsers>>) {
     },
     {
       userId: users.investor4.id,
+      channel: "EMAIL" as const,
       type: "account_blocked",
       title: "Account Blocked",
       message: "Your account has been blocked. Please contact support.",
@@ -1002,8 +1065,9 @@ async function seedNotifications(users: Awaited<ReturnType<typeof seedUsers>>) {
     },
     {
       userId: users.investor1.id,
-      type: "yield_paid",
-      title: "Yield Paid",
+      channel: "IN_APP" as const,
+      type: "yield_claimed",
+      title: "Yield Claimed",
       message: "Your yield of 456 USDT has been credited to your balance.",
       data: { amount: 456, month: "2024-11" },
       isRead: false,
@@ -1024,66 +1088,26 @@ async function seedUserPreferences(users: Awaited<ReturnType<typeof seedUsers>>)
   const preferences = [
     {
       userId: users.investor1.id,
-      emailNotifications: {
-        deposits: true,
-        withdrawals: true,
-        yields: true,
-        marketing: false,
-      },
-      pushNotifications: {
-        deposits: true,
-        withdrawals: true,
-        yields: true,
-        marketing: false,
-      },
+      emailNotifications: true,
+      inAppNotifications: true,
       language: "es",
     },
     {
       userId: users.investor2.id,
-      emailNotifications: {
-        deposits: true,
-        withdrawals: true,
-        yields: true,
-        marketing: true,
-      },
-      pushNotifications: {
-        deposits: false,
-        withdrawals: true,
-        yields: false,
-        marketing: false,
-      },
+      emailNotifications: true,
+      inAppNotifications: false,
       language: "es",
     },
     {
       userId: users.investor3.id,
-      emailNotifications: {
-        deposits: true,
-        withdrawals: true,
-        yields: true,
-        marketing: false,
-      },
-      pushNotifications: {
-        deposits: true,
-        withdrawals: true,
-        yields: true,
-        marketing: true,
-      },
+      emailNotifications: true,
+      inAppNotifications: true,
       language: "en",
     },
     {
       userId: users.investor4.id,
-      emailNotifications: {
-        deposits: false,
-        withdrawals: false,
-        yields: false,
-        marketing: false,
-      },
-      pushNotifications: {
-        deposits: false,
-        withdrawals: false,
-        yields: false,
-        marketing: false,
-      },
+      emailNotifications: false,
+      inAppNotifications: false,
       language: "es",
     },
   ];
@@ -1111,6 +1135,8 @@ async function main() {
   await prisma.transaction.deleteMany();
   await prisma.investment.deleteMany();
   await prisma.investmentModelConfig.deleteMany();
+  await prisma.userDepositAddress.deleteMany();
+  await prisma.userBalance.deleteMany();
   await prisma.user.deleteMany();
   await prisma.blockchain.deleteMany();
   console.log("  ✓ Cleaned all tables\n");
@@ -1118,11 +1144,13 @@ async function main() {
   // Seed in order of dependencies
   const blockchains = await seedBlockchains();
   const users = await seedUsers();
+  await seedUserBalances(users);
+  await seedUserDepositAddresses(users);
   const modelConfigs = await seedInvestmentModelConfigs();
   const investments = await seedInvestments(users, modelConfigs);
-  await seedTransactions(users, blockchains);
+  await seedTransactions(users);
   const monthlyYields = await seedMonthlyYields(users.admin);
-  await seedInvestmentYields(investments, monthlyYields, modelConfigs);
+  await seedInvestmentYields(investments, monthlyYields);
   await seedNotifications(users);
   await seedUserPreferences(users);
 
@@ -1130,8 +1158,10 @@ async function main() {
   console.log("\nSummary:");
   console.log("  - 6 blockchains");
   console.log("  - 5 users (1 admin + 4 investors)");
+  console.log("  - 5 user balances");
+  console.log("  - 7 user deposit addresses");
   console.log("  - 2 investment model configs");
-  console.log("  - 6 investments");
+  console.log("  - 15 investments");
   console.log("  - 10 transactions");
   console.log("  - 3 monthly yields");
   console.log("  - 9 investment yields");

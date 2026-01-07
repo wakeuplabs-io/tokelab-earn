@@ -184,11 +184,11 @@ function calculateAvailableToClaim(investment: InvestmentWithRelations): string 
 }
 
 /**
- * Calculate total claimed (PAID yields)
+ * Calculate total claimed (CLAIMED yields)
  */
 function calculateTotalClaimed(yields: Array<{ amount: string; status: string }>): string {
-  const paidYields = yields.filter((y) => y.status === "PAID");
-  return paidYields.reduce((sum, y) => sum + parseFloat(y.amount), 0).toFixed(6);
+  const claimedYields = yields.filter((y) => y.status === "CLAIMED");
+  return claimedYields.reduce((sum, y) => sum + parseFloat(y.amount), 0).toFixed(6);
 }
 
 /**

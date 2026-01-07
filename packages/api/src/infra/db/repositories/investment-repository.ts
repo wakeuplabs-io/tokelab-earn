@@ -36,6 +36,7 @@ export class InvestmentRepository {
         modelConfig: {
           select: {
             type: true,
+            durationDays: true,
             aprInitial: true,
             aprFinal: true,
             aprStepPct: true,
@@ -137,7 +138,6 @@ export class InvestmentRepository {
       modelConfigId: investment.modelConfigId,
       amount: investment.amount.toString(),
       currency: investment.currency,
-      durationDays: investment.durationDays,
       status: investment.status,
       startDate: investment.startDate,
       endDate: investment.endDate,
@@ -158,6 +158,7 @@ export class InvestmentRepository {
       },
       modelConfig: {
         type: investment.modelConfig.type,
+        durationDays: investment.modelConfig.durationDays,
         aprInitial: investment.modelConfig.aprInitial?.toString() ?? null,
         aprFinal: investment.modelConfig.aprFinal?.toString() ?? null,
         aprStepPct: investment.modelConfig.aprStepPct?.toString() ?? null,

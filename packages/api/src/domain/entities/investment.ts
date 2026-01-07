@@ -12,7 +12,6 @@ export interface Investment {
   modelConfigId: string;
   amount: string; // Decimal as string
   currency: string;
-  durationDays: number;
   status: InvestmentStatus;
   startDate: Date;
   endDate: Date;
@@ -30,6 +29,7 @@ export interface InvestmentWithRelations extends Investment {
   };
   modelConfig: {
     type: InvestmentModelType;
+    durationDays: number; // Investment duration in days
     aprInitial: string | null;
     aprFinal: string | null;
     aprStepPct: string | null;
