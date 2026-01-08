@@ -68,6 +68,13 @@ jobs:
       - name: Clean SST cache
         run: rm -rf .sst/pulumi
 
+      - name: Install Pulumi (forced, Node 22 compatible)
+        run: |
+          curl -fsSL https://get.pulumi.com | sh -s -- --version 3.117.0
+          echo "$HOME/.pulumi/bin" >> $GITHUB_PATH
+          pulumi version
+          which pulumi
+
       - name: Deploy
         run: npm run deploy:app:staging
         env:
@@ -80,3 +87,5 @@ jobs:
           FIREBLOCKS_WEBHOOK_SECRET: ${{ secrets.FIREBLOCKS_WEBHOOK_SECRET }}
           AUTH0_DOMAIN: ${{ secrets.AUTH0_DOMAIN }}
           AUTH0_AUDIENCE: ${{ vars.AUTH0_AUDIENCE }}
+          PULUMI_HOME: $HOME/.pulumi
+          PULUMI_SKIP_UPDATE_CHECK: "true"
