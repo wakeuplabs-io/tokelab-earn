@@ -16,11 +16,7 @@
     "db:studio": "prisma studio",
     "db:seed": "prisma db seed",
     "db:reset": "prisma migrate reset",
-    "db:setup": "prisma migrate deploy && prisma generate && tsx scripts/setup.ts",
-    "test": "vitest run",
-    "test:watch": "vitest",
-    "test:coverage": "vitest run --coverage",
-    "test:e2e": "vitest run tests/e2e"
+    "db:setup": "prisma migrate deploy && prisma generate && tsx scripts/setup.ts"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"
@@ -31,12 +27,10 @@
   "devDependencies": {
     "@types/jsonwebtoken": "^9.0.7",
     "@types/node": "^25.0.3",
-    "@vitest/coverage-v8": "^4.0.16",
     "esbuild": "^0.27.2",
     "prisma": "^6.0.0",
     "ts-node": "^10.9.2",
-    "tsx": "^4.21.0",
-    "vitest": "^4.0.16"
+    "tsx": "^4.21.0"
   },
   "dependencies": {
     "@hono/node-server": "1.19.7",
