@@ -63,6 +63,7 @@ jobs:
         run: npm run prisma:migrate
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          DIRECT_URL: ${{ secrets.DIRECT_URL }}
 
       - name: Deploy
         run: npm run deploy:app:staging
