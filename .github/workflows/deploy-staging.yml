@@ -3,7 +3,7 @@ name: Deploy Staging
 on:
   push:
     branches:
-      - develop-off
+      - develop
 
 jobs:
   deploy:
@@ -68,5 +68,11 @@ jobs:
         run: npm run deploy:app:staging
         env:
           NODE_ENV: staging
-          DOMAIN_SUFFIX: ${{ vars.DOMAIN_SUFFIX }}
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          DIRECT_URL: ${{ secrets.DIRECT_URL }}
+          FIREBLOCKS_API_KEY: ${{ secrets.FIREBLOCKS_API_KEY }}
+          FIREBLOCKS_SECRET_KEY_PATH: ${{ secrets.FIREBLOCKS_SECRET_KEY_PATH }}
+          FIREBLOCKS_BASE_URL: ${{ vars.FIREBLOCKS_BASE_URL }}
+          FIREBLOCKS_WEBHOOK_SECRET: ${{ secrets.FIREBLOCKS_WEBHOOK_SECRET }}
+          AUTH0_DOMAIN: ${{ secrets.AUTH0_DOMAIN }}
+          AUTH0_AUDIENCE: ${{ vars.AUTH0_AUDIENCE }}
