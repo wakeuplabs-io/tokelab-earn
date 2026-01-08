@@ -3,17 +3,15 @@
  * Uses Zod for runtime type safety
  */
 
+import { z } from "zod";
 import { config } from "dotenv";
 import { expand } from "dotenv-expand";
-import { z } from "zod";
-import path from "path";
+import path from "node:path";
 
-// Load .env file BEFORE anything else
-// This must happen at module load time, before validation
 expand(
   config({
     path: path.resolve(process.cwd(), process.env.NODE_ENV === "test" ? ".env.test" : ".env"),
-  }),
+  })
 );
 
 const envSchema = z.object({
