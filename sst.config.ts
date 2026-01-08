@@ -110,12 +110,6 @@ export default $config({
           to: "src/generated/prisma/",
         },
       ],
-      nodejs: {
-        format: "esm",
-        install: [
-          "@prisma/client",
-        ],
-      },
     });
 
     const api = new sst.aws.ApiGatewayV2("gateway", {
