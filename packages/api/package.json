@@ -11,6 +11,7 @@
     "lint:fix": "eslint src/**/*.ts --fix",
     "db:generate": "prisma generate",
     "db:migrate": "prisma migrate dev",
+    "prisma:migrate": "prisma migrate deploy",
     "db:studio": "prisma studio"
   },
   "keywords": [],
