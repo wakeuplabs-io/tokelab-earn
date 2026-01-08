@@ -1,7 +1,3 @@
-/**
- * Button Component
- */
-
 import { ButtonHTMLAttributes, forwardRef } from "react";
 import clsx from "clsx";
 

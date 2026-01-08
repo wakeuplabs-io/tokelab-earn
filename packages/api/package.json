@@ -23,6 +23,8 @@
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"
+    "prisma:migrate": "prisma migrate deploy",
+    "db:studio": "prisma studio"
   },
   "keywords": [],
   "author": "",

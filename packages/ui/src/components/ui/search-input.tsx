@@ -1,8 +1,3 @@
-/**
- * SearchInput Component
- * Higher Order Component that wraps Input with debounce functionality
- */
-
 import { useState, useCallback, useEffect } from "react";
 import { HiSearch } from "react-icons/hi";
 import { Input, InputProps } from "./input";
@@ -28,14 +23,12 @@ export function SearchInput({
     setValue(e.target.value);
   }, []);
 
-  // Call onSearch when debounced value changes
   const handleSearch = useCallback(() => {
     if (onSearch) {
       onSearch(debouncedValue);
     }
   }, [debouncedValue, onSearch]);
 
-  // Effect to trigger search when debounced value changes
   useEffect(() => {
     handleSearch();
   }, [debouncedValue, handleSearch]);

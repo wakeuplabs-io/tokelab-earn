@@ -1,8 +1,3 @@
-/**
- * Dropdown Component
- * Uses DaisyUI native dropdown functionality
- */
-
 import { HTMLAttributes, ReactNode } from "react";
 import clsx from "clsx";
 

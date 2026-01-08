@@ -1,7 +1,3 @@
-/**
- * User Profile Dropdown Component
- */
-
 import { Avatar } from "../ui/avatar";
 import { Dropdown, DropdownItem } from "../ui/dropdown";
 import { HiChevronDown } from "react-icons/hi";

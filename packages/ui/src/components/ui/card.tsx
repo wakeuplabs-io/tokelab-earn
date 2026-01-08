@@ -1,7 +1,3 @@
-/**
- * Card Component
- */
-
 import { HTMLAttributes, ReactNode } from "react";
 import clsx from "clsx";
 

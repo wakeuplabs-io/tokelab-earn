@@ -1,7 +1,3 @@
-/**
- * Input Component
- */
-
 import { InputHTMLAttributes, ReactNode, forwardRef } from "react";
 import clsx from "clsx";
 

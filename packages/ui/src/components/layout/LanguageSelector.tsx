@@ -1,7 +1,3 @@
-/**
- * Language Selector Component
- */
-
 import { Dropdown, DropdownItem } from "../ui/dropdown";
 import { HiChevronDown } from "react-icons/hi";
 

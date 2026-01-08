@@ -89,15 +89,18 @@ export default $config({
     // <-- Assets bucket and cloudfront distribution
 
     const apiEnv = {
-      ALCHEMY_AUTH_TOKEN: process.env.ALCHEMY_AUTH_TOKEN!,
-      ALCHEMY_WEBHOOK_SIGNING_KEY: process.env.ALCHEMY_WEBHOOK_SIGNING_KEY!,
-      ALCHEMY_APP_ID: process.env.ALCHEMY_APP_ID!,
       API_URL: API_URL,
       ASSETS_URL: ASSETS_URL,
       ASSETS_BUCKET_NAME: assetsBucket.name,
       CORS_ORIGINS: allowedOrigins.join(","),
       DATABASE_URL: process.env.DATABASE_URL!,
       DIRECT_URL: process.env.DIRECT_URL!,
+      FIREBLOCKS_API_KEY: process.env.FIREBLOCKS_API_KEY!,
+      FIREBLOCKS_SECRET_KEY_PATH: process.env.FIREBLOCKS_SECRET_KEY_PATH!,
+      FIREBLOCKS_BASE_URL: process.env.FIREBLOCKS_BASE_URL,
+      FIREBLOCKS_WEBHOOK_SECRET: process.env.FIREBLOCKS_WEBHOOK_SECRET!,
+      AUTH0_DOMAIN: process.env.AUTH0_DOMAIN!,
+      AUTH0_AUDIENCE: process.env.AUTH0_AUDIENCE,
       NODE_ENV: $app.stage,
     };
 
@@ -148,6 +151,8 @@ export default $config({
     const uiEnv = {
       VITE_API_URL: API_URL,
       VITE_ASSETS_URL: ASSETS_URL,
+      VITE_AUTH0_DOMAIN: process.env.AUTH0_DOMAIN!,
+      VITE_AUTH0_CLIENT_ID: process.env.AUTH0_CLIENT_ID!,
       NODE_ENV: $app.stage,
     };
 
