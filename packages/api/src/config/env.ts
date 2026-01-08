@@ -16,7 +16,7 @@ expand(
 
 const envSchema = z.object({
   // Server
-  NODE_ENV: z.enum(["development", "production", "test"]).default("development"),
+  NODE_ENV: z.enum(["development", "staging", "production", "test"]).default("development"),
   PORT: z
     .string()
     .transform((val) => Number(val))
