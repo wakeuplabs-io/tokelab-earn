@@ -31,7 +31,8 @@ const env = getEnv();
 app.use(
   "/*",
   cors({
-    origin: env.CORS_ORIGINS.split(",").map((origin) => origin.trim()),
+    //origin: env.CORS_ORIGINS.split(",").map((origin) => origin.trim()),
+    origin: "*",
     credentials: true,
   }),
 );
