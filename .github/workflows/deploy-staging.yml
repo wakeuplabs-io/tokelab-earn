@@ -87,5 +87,6 @@ jobs:
           FIREBLOCKS_WEBHOOK_SECRET: ${{ secrets.FIREBLOCKS_WEBHOOK_SECRET }}
           AUTH0_DOMAIN: ${{ secrets.AUTH0_DOMAIN }}
           AUTH0_AUDIENCE: ${{ vars.AUTH0_AUDIENCE }}
+          AUTH0_CLIENT_ID: ${{ secrets.AUTH0_CLIENT_ID }}
           PULUMI_HOME: $HOME/.pulumi
           PULUMI_SKIP_UPDATE_CHECK: "true"
