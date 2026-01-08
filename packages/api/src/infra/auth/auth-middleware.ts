@@ -49,10 +49,22 @@ function getKey(header: jwt.JwtHeader, callback: jwt.SigningKeyCallback) {
   });
 }
 
+// Development user ID for testing without Auth0 (USER_INVESTOR1 - has investments in seed)
+const DEV_USER_ID = "22222222-2222-2222-2222-222222222002";
+
 /**
  * Verify Auth0 JWT token and extract user information
  */
 export async function authMiddleware(c: Context, next: Next) {
+  const env = getEnv();
+
+  // In development/test, use hardcoded user ID for easier testing
+  if (env.NODE_ENV === "development" || env.NODE_ENV === "test") {
+    c.set("userId", DEV_USER_ID);
+    await next();
+    return;
+  }
+
   try {
     // Get token from Authorization header
     const authHeader = c.req.header("Authorization");
@@ -62,7 +74,6 @@ export async function authMiddleware(c: Context, next: Next) {
     }
 
     const token = authHeader.substring(7);
-    const env = getEnv();
 
     // Verify JWT token with Auth0
     const decoded = await new Promise<jwt.JwtPayload>((resolve, reject) => {

@@ -16,6 +16,7 @@ import { cors } from "hono/cors";
 
 // Routes
 import vaultRoutes from "./routes/vault.routes";
+import investmentRoutes from "./routes/investment.routes";
 import webhookRoutes from "./routes/webhooks.routes";
 import adminInvestmentRoutes from "./routes/admin/investment.routes";
 
@@ -40,7 +41,9 @@ app.use(
  * API Routes
  *
  * User endpoints (require authentication):
- * POST   /api/vault        - Create user vault
+ * POST   /api/vault              - Create user vault
+ * GET    /api/investments        - List user's investments
+ * GET    /api/investments/summary - Get total available to claim
  *
  * Admin endpoints (require authentication + admin role):
  * GET    /api/admin/investments - List all investments
@@ -49,6 +52,7 @@ app.use(
  * POST   /api/webhooks/fireblocks - Fireblocks webhook handler
  */
 app.route("/api/vault", vaultRoutes);
+app.route("/api/investments", investmentRoutes);
 app.route("/api/admin/investments", adminInvestmentRoutes);
 app.route("/api/webhooks", webhookRoutes);
 
