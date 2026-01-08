@@ -65,6 +65,9 @@ jobs:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
           DIRECT_URL: ${{ secrets.DIRECT_URL }}
 
+      - name: Clean SST cache
+        run: rm -rf .sst/pulumi
+
       - name: Deploy
         run: npm run deploy:app:staging
         env:
