@@ -49,7 +49,6 @@ export type Env = z.infer<typeof envSchema>;
 
 let env: Env;
 
-console.log("process.env", process.env);
 export function getEnv(): Env {
   if (!env) {
     const result = envSchema.safeParse(process.env);

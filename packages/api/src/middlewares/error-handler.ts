@@ -9,7 +9,7 @@
  * - Unexpected errors
  */
 
-import { Context, Next } from "hono";
+import { Context } from "hono";
 import { ZodError } from "zod";
 import jwt from "jsonwebtoken";
 import { DomainError, ValidationError } from "../lib/errors";
@@ -22,15 +22,11 @@ export interface ErrorResponse {
 }
 
 /**
- * Error handler middleware
- * Should be registered as the last middleware
+ * Error handler for app.onError()
+ * Handles all uncaught errors from route handlers
  */
-export async function errorHandler(c: Context, next: Next) {
-  try {
-    await next();
-  } catch (error) {
-    return handleError(c, error);
-  }
+export function errorHandler(error: unknown, c: Context): Response {
+  return handleError(c, error);
 }
 
 /**

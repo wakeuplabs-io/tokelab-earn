@@ -17,6 +17,7 @@ import { cors } from "hono/cors";
 // Routes
 import vaultRoutes from "./routes/vault.routes";
 import webhookRoutes from "./routes/webhooks.routes";
+import adminInvestmentRoutes from "./routes/admin/investment.routes";
 
 /**
  * Main Hono application instance
@@ -41,10 +42,14 @@ app.use(
  * User endpoints (require authentication):
  * POST   /api/vault        - Create user vault
  *
+ * Admin endpoints (require authentication + admin role):
+ * GET    /api/admin/investments - List all investments
+ *
  * Webhooks (no auth, signature verified):
  * POST   /api/webhooks/fireblocks - Fireblocks webhook handler
  */
 app.route("/api/vault", vaultRoutes);
+app.route("/api/admin/investments", adminInvestmentRoutes);
 app.route("/api/webhooks", webhookRoutes);
 
 /**

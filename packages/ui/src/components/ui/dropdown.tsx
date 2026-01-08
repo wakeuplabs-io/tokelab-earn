@@ -34,7 +34,7 @@ export function Dropdown({
         "dropdown",
         align && alignClasses[align],
         positionClasses[position],
-        className
+        className,
       )}
       {...props}
     >

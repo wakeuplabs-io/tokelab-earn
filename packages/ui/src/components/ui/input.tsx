@@ -38,24 +38,16 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
         <div className="relative">
           {iconLeft && (
             <div
-              className={clsx(
-                "absolute left-3 top-1/2 -translate-y-1/2 z-10 pointer-events-none",
-                {
-                  "text-error": error,
-                  "text-success": success && !error,
-                  "text-neutral-l-grey": props.disabled || (!error && !success),
-                },
-              )}
+              className={clsx("absolute left-3 top-1/2 -translate-y-1/2 z-10 pointer-events-none", {
+                "text-error": error,
+                "text-success": success && !error,
+                "text-neutral-l-grey": props.disabled || (!error && !success),
+              })}
             >
               {iconLeft}
             </div>
           )}
-          <input
-            ref={ref}
-            className={inputClasses}
-            disabled={props.disabled}
-            {...props}
-          />
+          <input ref={ref} className={inputClasses} disabled={props.disabled} {...props} />
           {iconRight && (
             <div
               className={clsx(

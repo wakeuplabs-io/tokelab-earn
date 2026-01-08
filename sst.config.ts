@@ -1,3 +1,4 @@
+// eslint-disable-next-line @typescript-eslint/triple-slash-reference
 /// <reference path="./.sst/platform/config.d.ts" />
 
 const PROJECT_NAME = "tokelab-earn";
@@ -87,7 +88,6 @@ export default $config({
 
     // <-- Assets bucket and cloudfront distribution
 
-
     const apiEnv = {
       API_URL: API_URL,
       ASSETS_URL: ASSETS_URL,
@@ -103,8 +103,6 @@ export default $config({
       AUTH0_AUDIENCE: process.env.AUTH0_AUDIENCE,
       NODE_ENV: $app.stage,
     };
-    
-
 
     const apiFunction = new sst.aws.Function("api", {
       handler: "packages/api/src/index.handler",
@@ -149,7 +147,6 @@ export default $config({
     api.route("ANY /", apiFunction.arn);
     // <-- API deployment
 
-   
     // Prepare UI environment
     const uiEnv = {
       VITE_API_URL: API_URL,

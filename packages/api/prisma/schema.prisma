@@ -10,31 +10,312 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
   directUrl = env("DIRECT_URL")
 }
 
-enum VaultStatus {
-  CREATING
+// ============================================================================
+// ENUMS
+// ============================================================================
+
+enum UserRole {
+  INVESTOR
+  ADMIN
+}
+
+enum KycStatus {
+  NOT_STARTED
+  IN_PROGRESS
+  VERIFIED
+  REJECTED
+}
+
+enum InvestmentStatus {
   ACTIVE
-  SUSPENDED
-  CLOSED
+  COMPLETED
+  CANCELLED
 }
 
+enum InvestmentModelType {
+  FIXED
+  VARIABLE
+}
+
+enum TransactionType {
+  DEPOSIT
+  WITHDRAWAL
+}
+
+enum TransactionStatus {
+  PENDING
+  PROCESSING
+  COMPLETED
+  FAILED
+}
+
+enum YieldStatus {
+  PENDING
+  CLAIMED
+}
+
+enum MonthlyYieldStatus {
+  PENDING
+  PROCESSED
+}
+
+enum NotificationChannel {
+  EMAIL
+  IN_APP
+}
+
+enum Currency {
+  USDT
+  USDC
+}
+
+// ============================================================================
+// MODELS
+// ============================================================================
+
+/// System users (investors and administrators)
 model User {
-  id        String   @id @default(uuid())
-  email     String   @unique
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id                String    @id @default(uuid())
+  email             String    @unique
+  auth0Id           String    @unique
+  firstName         String?
+  lastName          String?
+  phone             String?
+  role              UserRole  @default(INVESTOR)
+  kycStatus         KycStatus @default(NOT_STARTED)
+  kycProviderId     String?
+  fireblocksVaultId String?
+  isBlocked         Boolean   @default(false)
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+
+  // Relations
+  investments      Investment[]
+  transactions     Transaction[]
+  notifications    Notification[]
+  preferences      UserPreference?
+  monthlyYields    MonthlyYield[]       @relation("UploadedBy")
+  balances         UserBalance[]
+  depositAddresses UserDepositAddress[]
+
+  @@index([email])
+  @@index([auth0Id])
+  @@index([role])
 }
 
-model Vault {
+/// User balances per currency
+model UserBalance {
   id        String   @id @default(uuid())
-  userId    String   @unique
-  fireblocksVaultId String
-  name      String
-  status    VaultStatus @default(CREATING)
+  userId    String
+  currency  Currency
+  available Decimal  @default(0) @db.Decimal(20, 6)
+  // locked = SUM(Investment.amount) WHERE status = ACTIVE AND currency = this.currency
+  locked    Decimal  @default(0) @db.Decimal(20, 6)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  // Relations
+  user User @relation(fields: [userId], references: [id])
+
+  @@unique([userId, currency])
+  @@index([userId])
+}
+
+/// User deposit addresses per blockchain
+model UserDepositAddress {
+  id           String   @id @default(uuid())
+  userId       String
+  blockchainId String
+  address      String
+  createdAt    DateTime @default(now())
+
+  // Relations
+  user       User       @relation(fields: [userId], references: [id])
+  blockchain Blockchain @relation(fields: [blockchainId], references: [id])
+
+  @@unique([userId, blockchainId])
+  @@index([userId])
+  @@index([blockchainId])
+}
+
+/// Investments made by users
+model Investment {
+  id            String           @id @default(uuid())
+  userId        String
+  modelConfigId String
+  amount        Decimal          @db.Decimal(20, 6)
+  currency      String           @default("USDT")
+  status        InvestmentStatus @default(ACTIVE)
+  startDate     DateTime
+  endDate       DateTime
+  accruedYield  Decimal          @default(0) @db.Decimal(20, 6)
+  createdAt     DateTime         @default(now())
+  updatedAt     DateTime         @updatedAt
+
+  // Relations
+  user        User                  @relation(fields: [userId], references: [id])
+  modelConfig InvestmentModelConfig @relation(fields: [modelConfigId], references: [id])
+  yields      InvestmentYield[]
+
+  @@index([userId])
+  @@index([status])
+  @@index([modelConfigId])
+}
+
+/// Investment model configuration (immutable - new row on edit)
+model InvestmentModelConfig {
+  id                     String              @id @default(uuid())
+  type                   InvestmentModelType
+  name                   String
+  description            String?
+  minInvestment          Decimal             @db.Decimal(20, 6)
+  maxInvestment          Decimal?            @db.Decimal(20, 6)
+  durationDays           Int                 // Investment duration in days
+
+  // FIXED model only (progressive APR)
+  aprInitial             Decimal?            @db.Decimal(5, 2)
+  aprFinal               Decimal?            @db.Decimal(5, 2)
+  aprStepPct             Decimal?            @db.Decimal(5, 2)
+  aprStepPeriodDays      Int?
+  claimPeriodDays        Int?                // Days between claim windows (e.g., 60)
+
+  // VARIABLE model only
+  profitShareInvestor    Decimal?            @db.Decimal(5, 2)
+
+  // Common fields
+  withdrawalPeriod       Int?
+  earlyWithdrawalPenalty Decimal?            @db.Decimal(5, 2)
+  isCurrent              Boolean             @default(true)
+  version                Int                 @default(1)
+  createdAt              DateTime            @default(now())
+
+  // Relations
+  investments Investment[]
+
+  @@index([type])
+  @@index([isCurrent])
+  @@index([type, isCurrent])
+}
+
+/// Supported blockchains
+model Blockchain {
+  id          String  @id @default(uuid())
+  name        String  @unique // Ethereum, BNB Smart Chain, Tron, Polygon, Arbitrum, Solana
+  symbol      String  @unique // ERC20, BEP20, TRC20, POLYGON, ARB, SOL
+  chainId     Int?    // EVM chain ID (1=Ethereum, 56=BSC, 137=Polygon, 42161=Arbitrum)
+  explorerUrl String? // https://etherscan.io, https://tronscan.org, etc.
+  isActive    Boolean @default(true)
+
+  // Relations
+  transactions     Transaction[]
+  depositAddresses UserDepositAddress[]
+}
+
+/// On-chain transactions (deposits and withdrawals)
+model Transaction {
+  id                 String            @id @default(uuid())
+  userId             String
+  blockchainId       String
+  type               TransactionType
+  amount             Decimal           @db.Decimal(20, 6)
+  currency           String            @default("USDT")
+  status             TransactionStatus @default(PENDING)
+  fireblocksTxId     String?
+  txHash             String?
+  sourceAddress      String?
+  destinationAddress String?
+  networkFee         Decimal?          @db.Decimal(20, 6)
+  failureReason      String?
+  createdAt          DateTime          @default(now())
+  processedAt        DateTime?
+  completedAt        DateTime?
+
+  // Relations
+  user       User       @relation(fields: [userId], references: [id])
+  blockchain Blockchain @relation(fields: [blockchainId], references: [id])
+
+  @@index([userId])
+  @@index([status])
+  @@index([type])
+  @@index([fireblocksTxId])
+  @@index([blockchainId])
+}
+
+/// Investment yields (per month)
+model InvestmentYield {
+  id             String      @id @default(uuid())
+  investmentId   String
+  monthlyYieldId String?
+  month          String      // YYYY-MM
+  grossReturn    Decimal?    @db.Decimal(5, 2) // % return (e.g., 4.20)
+  activeDays     Int?
+  amount         Decimal     @db.Decimal(20, 6) // USDT amount credited
+  status         YieldStatus @default(PENDING)
+  claimedAt      DateTime?   // When user claimed this yield
+  createdAt      DateTime    @default(now())
+
+  // Relations
+  investment   Investment    @relation(fields: [investmentId], references: [id])
+  monthlyYield MonthlyYield? @relation(fields: [monthlyYieldId], references: [id])
+
+  @@unique([investmentId, month])
+  @@index([investmentId])
+  @@index([month])
+  @@index([status])
+  @@index([monthlyYieldId])
+}
+
+/// Monthly bot yields (VARIABLE model only)
+model MonthlyYield {
+  id              String             @id @default(uuid())
+  month           String             @unique // YYYY-MM
+  actualReturnPct Decimal            @db.Decimal(5, 2)
+  documentUrl     String?
+  uploadedBy      String
+  status          MonthlyYieldStatus @default(PENDING)
+  createdAt       DateTime           @default(now())
+  processedAt     DateTime?
+
+  // Relations
+  uploadedByUser   User              @relation("UploadedBy", fields: [uploadedBy], references: [id])
+  investmentYields InvestmentYield[]
+}
+
+/// User notifications
+model Notification {
+  id        String              @id @default(uuid())
+  userId    String
+  channel   NotificationChannel
+  templateId String
+  data      Json?
+  isRead    Boolean             @default(false)
+  createdAt DateTime            @default(now())
+
+  // Relations
+  user User @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+  @@index([channel])
+  @@index([templateId])
+  @@index([isRead])
+  @@index([createdAt(sort: Desc)])
+}
+
+/// User preferences
+model UserPreference {
+  id                   String   @id @default(uuid())
+  userId               String   @unique
+  emailNotifications   Boolean  @default(true)
+  inAppNotifications   Boolean  @default(true)
+  language             String   @default("es")
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
+
+  // Relations
+  user User @relation(fields: [userId], references: [id])
 }
