@@ -19,12 +19,9 @@ export function SearchInput({
   const [value, setValue] = useState<string>(defaultValue);
   const debouncedValue = useDebounce(value, debounceDelay);
 
-  const handleChange = useCallback(
-    (e: React.ChangeEvent<HTMLInputElement>) => {
-      setValue(e.target.value);
-    },
-    [],
-  );
+  const handleChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    setValue(e.target.value);
+  }, []);
 
   const handleSearch = useCallback(() => {
     if (onSearch) {
@@ -48,4 +45,3 @@ export function SearchInput({
     />
   );
 }
-

@@ -45,3 +45,5 @@ packages/ui/cache
 
 # Prisma generated client
 packages/api/src/generated/
+
+/docs

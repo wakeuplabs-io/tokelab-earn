@@ -1,16 +1,16 @@
 /**
- * Prisma client configuration for serverless environments
- * Uses Neon serverless adapter for connection pooling
+ * Prisma client configuration
+ * Uses Neon serverless adapter in production, standard client in development
  */
 
 import { PrismaClient } from "../generated/prisma/client";
-import { PrismaNeon } from "@prisma/adapter-neon";
 
 let prisma: PrismaClient;
 
 /**
  * Get Prisma client instance (singleton)
- * Creates a new instance with Neon adapter for serverless compatibility
+ * In development: uses standard Prisma client for local PostgreSQL
+ * In production: could use Neon adapter for serverless (configure as needed)
  */
 export function getPrismaClient(): PrismaClient {
   if (!prisma) {
@@ -20,17 +20,16 @@ export function getPrismaClient(): PrismaClient {
       throw new Error("DATABASE_URL environment variable is required");
     }
 
-    // Create Neon connection pool
-    const poolConfig = {
-      connectionString,
-      directUrl: process.env.DIRECT_URL,
-    };
-    const adapter = new PrismaNeon(poolConfig);
-
+    // Use standard Prisma client
+    // For production with Neon serverless, uncomment the adapter code
     prisma = new PrismaClient({
-      adapter,
       log: process.env.NODE_ENV === "development" ? ["query", "error", "warn"] : ["error"],
     });
+
+    // Production with Neon serverless (uncomment when deploying):
+    // import { PrismaNeon } from "@prisma/adapter-neon";
+    // const adapter = new PrismaNeon({ connectionString });
+    // prisma = new PrismaClient({ adapter, log: ["error"] });
   }
 
   return prisma;

@@ -6,7 +6,15 @@ import { HTMLAttributes, ReactNode } from "react";
 import clsx from "clsx";
 
 export interface BadgeProps extends HTMLAttributes<HTMLDivElement> {
-  variant?: "default" | "primary" | "secondary" | "accent" | "success" | "warning" | "error" | "info";
+  variant?:
+    | "default"
+    | "primary"
+    | "secondary"
+    | "accent"
+    | "success"
+    | "warning"
+    | "error"
+    | "info";
   size?: "xs" | "sm" | "md" | "lg";
   outline?: boolean;
   children: ReactNode;
@@ -44,4 +52,3 @@ export function Badge({
     </div>
   );
 }
-

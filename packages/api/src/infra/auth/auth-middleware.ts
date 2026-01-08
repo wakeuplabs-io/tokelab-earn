@@ -6,8 +6,8 @@
  */
 
 import { Context, Next } from "hono";
-import jwt, { type JwtPayload, type VerifyErrors } from "jsonwebtoken";
-import jwksClient, { type SigningKey } from "jwks-rsa";
+import jwt, { type JwtPayload } from "jsonwebtoken";
+import jwksClient from "jwks-rsa";
 import { getEnv } from "../../config/env";
 
 // Cache for JWKS client (singleton)

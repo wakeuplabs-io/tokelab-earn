@@ -70,11 +70,13 @@ export function Avatar({
         )}
         {status && (
           <div
-            className={clsx("absolute bottom-0 right-0 w-3 h-3 rounded-full border-2 border-base-100", statusClasses[status])}
+            className={clsx(
+              "absolute bottom-0 right-0 w-3 h-3 rounded-full border-2 border-base-100",
+              statusClasses[status],
+            )}
           />
         )}
       </div>
     </div>
   );
 }
-

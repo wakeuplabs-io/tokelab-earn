@@ -38,14 +38,18 @@ export function HomePage() {
               {/* Primary Buttons */}
               <div className="space-y-4">
                 <h3 className="text-lg font-semibold">Primary Buttons</h3>
-                
+
                 {/* No Icon */}
                 <div className="space-y-2">
                   <p className="text-sm font-medium text-neutral-l-grey">No icon</p>
                   <div className="flex flex-wrap gap-4 items-center">
                     <Button variant="primary">Label</Button>
-                    <Button variant="primary" isLoading>Label</Button>
-                    <Button variant="primary" disabled>Label</Button>
+                    <Button variant="primary" isLoading>
+                      Label
+                    </Button>
+                    <Button variant="primary" disabled>
+                      Label
+                    </Button>
                   </div>
                 </div>
 
@@ -69,14 +73,18 @@ export function HomePage() {
               {/* Secondary Buttons */}
               <div className="space-y-4">
                 <h3 className="text-lg font-semibold">Secondary Buttons</h3>
-                
+
                 {/* No Icon */}
                 <div className="space-y-2">
                   <p className="text-sm font-medium text-neutral-l-grey">No icon</p>
                   <div className="flex flex-wrap gap-4 items-center">
                     <Button variant="secondary">Label</Button>
-                    <Button variant="secondary" isLoading>Label</Button>
-                    <Button variant="secondary" disabled>Label</Button>
+                    <Button variant="secondary" isLoading>
+                      Label
+                    </Button>
+                    <Button variant="secondary" disabled>
+                      Label
+                    </Button>
                   </div>
                 </div>
 
@@ -163,7 +171,10 @@ export function HomePage() {
                   </div>
                   <div className="space-y-2">
                     <p className="text-sm font-medium text-neutral-l-grey">Error</p>
-                    <SearchInput onSearch={(value) => console.log("Search:", value)} error="Error message" />
+                    <SearchInput
+                      onSearch={(value) => console.log("Search:", value)}
+                      error="Error message"
+                    />
                   </div>
                   <div className="space-y-2">
                     <p className="text-sm font-medium text-neutral-l-grey">Success</p>
