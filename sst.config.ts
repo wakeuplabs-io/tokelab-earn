@@ -110,6 +110,9 @@ export default $config({
           to: "src/generated/prisma/",
         },
       ],
+      nodejs: {
+        format: "cjs",
+      },
     });
 
     const api = new sst.aws.ApiGatewayV2("gateway", {
