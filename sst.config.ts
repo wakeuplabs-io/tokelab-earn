@@ -35,6 +35,7 @@ export default $config({
     const allowedOrigins = [
       "http://localhost:3000",
       "http://localhost:3001",
+      "https://d1tg30xkclf6bx.cloudfront.net",
     ];
 
     // ─────────────────────────────────────────
