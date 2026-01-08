@@ -36,33 +36,17 @@ export default $config({
     console.log("✅ [SST] Environment variables loaded");
 
     console.log("🌐 [SST] Calculating domain URLs...");
-    // Use custom domain if provided, otherwise use default AWS domains
-    const domainBase = process.env.DOMAIN_BASE; // e.g., "example.com"
-    const hasCustomDomain = domainBase && domainBase.includes(".");
-    
-    let UI_DOMAIN_URL: string | undefined;
-    let API_DOMAIN_URL: string | undefined;
-    let ASSETS_DOMAIN_URL: string | undefined;
-    let UI_URL: string;
-    let API_URL: string;
-    let ASSETS_URL: string;
-    
-    if (hasCustomDomain) {
-      const stageSuffix =
-        $app.stage === "production" ? "" : $app.stage === "staging" ? "-staging" : "-dev";
-      UI_DOMAIN_URL = stageSuffix ? `${PROJECT_NAME}${stageSuffix}.${domainBase}` : `${PROJECT_NAME}.${domainBase}`;
-      API_DOMAIN_URL = `api.${UI_DOMAIN_URL}`;
-      ASSETS_DOMAIN_URL = `assets.${UI_DOMAIN_URL}`;
-      UI_URL = `https://${UI_DOMAIN_URL}`;
-      API_URL = `https://${API_DOMAIN_URL}`;
-      ASSETS_URL = `https://${ASSETS_DOMAIN_URL}`;
-    } else {
-      // Will be set after resources are created
-      UI_URL = "https://placeholder";
-      API_URL = "https://placeholder";
-      ASSETS_URL = "https://placeholder";
-    }
-    console.log("✅ [SST] Domain URLs calculated:", { UI_URL, API_URL, ASSETS_URL, hasCustomDomain });
+    const stageSuffix =
+      $app.stage === "production" ? "" : $app.stage === "staging" ? "-staging" : "-dev";
+    const UI_DOMAIN_URL = `${PROJECT_NAME}${stageSuffix}`;
+    const UI_URL = `https://${UI_DOMAIN_URL}`;
+
+    const API_DOMAIN_URL = `api.${UI_DOMAIN_URL}`;
+    const API_URL = `https://${API_DOMAIN_URL}`;
+
+    const ASSETS_DOMAIN_URL = `assets.${UI_DOMAIN_URL}`;
+    const ASSETS_URL = `https://${ASSETS_DOMAIN_URL}`;
+    console.log("✅ [SST] Domain URLs calculated:", { UI_URL, API_URL, ASSETS_URL });
 
     const allowedOrigins = [
       UI_URL,
@@ -91,8 +75,8 @@ export default $config({
 
     //SST Router wouldn't create cloudfront, so using this instead
     console.log("🌐 [SST] Creating assets CDN...");
-    const assetsCdn = new sst.aws.Cdn("assets-cdn", {
-      ...(ASSETS_DOMAIN_URL ? { domain: ASSETS_DOMAIN_URL } : {}),
+    new sst.aws.Cdn("assets-cdn", {
+      domain: ASSETS_DOMAIN_URL,
       origins: [
         {
           domainName: $interpolate`${assetsBucket.domain}`,
@@ -116,30 +100,12 @@ export default $config({
 
     // <-- Assets bucket and cloudfront distribution
 
-    // deploy API Gateway with custom domain (create before function to use its URL)
-    console.log("🚪 [SST] Creating API Gateway...");
-    const api = new sst.aws.ApiGatewayV2("gateway", {
-      ...(API_DOMAIN_URL ? { domain: API_DOMAIN_URL } : {}),
-      cors: {
-        allowOrigins: hasCustomDomain ? allowedOrigins : ["*"],
-        allowMethods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
-        allowHeaders: ["*"],
-      },
-    });
-
     console.log("🔧 [SST] Preparing API environment variables...");
-    // Now we can use api.url since api is created
-    const finalAPIUrl = hasCustomDomain ? API_URL : $interpolate`${api.url}`;
-    const finalAssetsUrl = hasCustomDomain ? ASSETS_URL : $interpolate`${assetsCdn.url}`;
-    const finalCorsOrigins = hasCustomDomain 
-      ? allowedOrigins.join(",") 
-      : $interpolate`${api.url},${assetsCdn.url},http://localhost:3000,http://localhost:3001`;
-    
     const apiEnv = {
-      API_URL: finalAPIUrl,
-      ASSETS_URL: finalAssetsUrl,
-      ASSETS_BUCKET_NAME: $interpolate`${assetsBucket.name}`,
-      CORS_ORIGINS: finalCorsOrigins,
+      API_URL: API_URL,
+      ASSETS_URL: ASSETS_URL,
+      ASSETS_BUCKET_NAME: assetsBucket.name,
+      CORS_ORIGINS: allowedOrigins.join(","),
       DATABASE_URL: process.env.DATABASE_URL!,
       DIRECT_URL: process.env.DIRECT_URL!,
       FIREBLOCKS_API_KEY: process.env.FIREBLOCKS_API_KEY!,
@@ -156,7 +122,10 @@ export default $config({
     console.log("⚡ [SST] Creating API function...");
     const apiFunction = new sst.aws.Function("api", {
       handler: "packages/api/src/index.handler",
-      environment: apiEnv,
+      environment: {
+        ...apiEnv,
+        ASSETS_BUCKET_NAME: $interpolate`${assetsBucket.name}`,
+      },
       permissions: [
         {
           actions: ["s3:PutObject", "s3:PutObjectAcl", "s3:GetObject", "s3:ListBucket"],
@@ -180,6 +149,17 @@ export default $config({
     });
     console.log("✅ [SST] API function created:", apiFunction.arn);
 
+    // deploy API Gateway with custom domain
+    console.log("🚪 [SST] Creating API Gateway...");
+    const api = new sst.aws.ApiGatewayV2("gateway", {
+      domain: API_DOMAIN_URL,
+      cors: {
+        allowOrigins: allowedOrigins,
+        allowMethods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
+        allowHeaders: ["*"],
+      },
+    });
+
     // Add routes to connect API Gateway to the function
     console.log("🛣️  [SST] Adding API routes...");
     api.route("ANY /{proxy+}", apiFunction.arn);
@@ -188,10 +168,10 @@ export default $config({
     // <-- API deployment
 
     console.log("🎨 [SST] Preparing UI environment variables...");
-    // Prepare UI environment - now we can use api.url and assetsCdn.url
+    // Prepare UI environment
     const uiEnv = {
-      VITE_API_URL: finalAPIUrl,
-      VITE_ASSETS_URL: finalAssetsUrl,
+      VITE_API_URL: API_URL,
+      VITE_ASSETS_URL: ASSETS_URL,
       VITE_AUTH0_DOMAIN: process.env.AUTH0_DOMAIN!,
       VITE_AUTH0_CLIENT_ID: process.env.AUTH0_CLIENT_ID!,
       NODE_ENV: $app.stage,
@@ -201,15 +181,9 @@ export default $config({
 
     // --> UI deployment
     console.log("🌐 [SST] Processing UI domain configuration...");
-    const uiDomainConfig = UI_DOMAIN_URL ? (() => {
-      const domainRoot = UI_DOMAIN_URL.replace(/^https?:\/\/(www\.)?/, "");
-      const domainAlias = UI_DOMAIN_URL.replace(/^https?:\/\//, "");
-      console.log("📋 [SST] Domain root:", domainRoot, "Domain alias:", domainAlias);
-      return {
-        name: domainRoot,
-        aliases: domainAlias !== domainRoot ? [domainAlias] : [],
-      };
-    })() : undefined;
+    const domainRoot = UI_DOMAIN_URL.replace(/^https?:\/\/(www\.)?/, "");
+    const domainAlias = UI_DOMAIN_URL.replace(/^https?:\/\//, "");
+    console.log("📋 [SST] Domain root:", domainRoot, "Domain alias:", domainAlias);
 
     console.log("🎨 [SST] Creating UI StaticSite...");
     const ui = new sst.aws.StaticSite("ui", {
@@ -217,7 +191,10 @@ export default $config({
         command: "npm run build --workspace=packages/ui",
         output: "packages/ui/dist",
       },
-      ...(uiDomainConfig ? { domain: uiDomainConfig } : {}),
+      domain: {
+        name: domainRoot,
+        aliases: domainAlias !== domainRoot ? [domainAlias] : [],
+      },
       environment: uiEnv,
       assets: {
         textEncoding: "utf-8",
@@ -260,13 +237,10 @@ export default $config({
     // <-- UI deployment
 
     console.log("📤 [SST] Preparing return values...");
-    // Use the URLs we already calculated (finalAPIUrl and finalAssetsUrl are defined above)
-    const finalUIUrl = hasCustomDomain ? UI_URL : ui.url;
-    
     const returnValues = {
-      ui: finalUIUrl,
-      api: finalAPIUrl,
-      assetsUrl: finalAssetsUrl,
+      ui: ui.url,
+      api: api.url,
+      assetsUrl: ASSETS_URL,
       assetsBucketName: assetsBucket.name,
     };
     console.log("✅ [SST] Return values prepared:", returnValues);
