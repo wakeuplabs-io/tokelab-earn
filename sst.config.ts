@@ -90,6 +90,7 @@ export default $config({
 
     const apiFunction = new sst.aws.Function("api", {
       handler: "packages/api/src/index.handler",
+      runtime: "nodejs22.x",
       environment: {
         ...apiEnv,
         ASSETS_BUCKET_NAME: $interpolate`${assetsBucket.name}`,
@@ -109,6 +110,9 @@ export default $config({
           to: "src/generated/prisma/",
         },
       ],
+      nodejs: {
+        format: "cjs",
+      },
     });
 
     const api = new sst.aws.ApiGatewayV2("gateway", {
