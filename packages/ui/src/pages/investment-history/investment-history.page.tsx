@@ -168,11 +168,7 @@ export function InvestmentHistoryPage() {
     <div className="space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div className="w-[280px]">
-          <SearchInput
-            placeholder="Buscar..."
-            onSearch={handleSearch}
-            debounceDelay={500}
-          />
+          <SearchInput placeholder="Buscar..." onSearch={handleSearch} debounceDelay={500} />
         </div>
 
         <div className="flex items-center gap-3">

@@ -5,7 +5,7 @@
  */
 
 import { useState, useRef, useEffect } from "react";
-import { DateRangePicker, createStaticRanges } from "react-date-range";
+import { DateRangePicker, createStaticRanges, RangeKeyDict } from "react-date-range";
 import {
   startOfDay,
   endOfDay,
@@ -145,8 +145,15 @@ export function DateRangeFilter({
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [isOpen]);
 
-  const handleSelect = (ranges: any) => {
-    setLocalRange(ranges.selection);
+  const handleSelect = (ranges: RangeKeyDict) => {
+    const selection = ranges.selection;
+    if (selection.startDate && selection.endDate && selection.key) {
+      setLocalRange({
+        startDate: selection.startDate,
+        endDate: selection.endDate,
+        key: selection.key,
+      });
+    }
   };
 
   const handleApply = () => {
@@ -197,7 +204,7 @@ export function DateRangeFilter({
         onClick={() => setIsOpen(!isOpen)}
         className={clsx(
           "inline-flex items-center gap-2 px-3 py-1.5 text-sm font-medium rounded-lg border bg-white hover:bg-base-200 transition-colors whitespace-nowrap",
-          hasValue ? "border-primary text-primary" : "border-base-300 text-base-content"
+          hasValue ? "border-primary text-primary" : "border-base-300 text-base-content",
         )}
       >
         <HiOutlineCalendar className="w-4 h-4 flex-shrink-0" />

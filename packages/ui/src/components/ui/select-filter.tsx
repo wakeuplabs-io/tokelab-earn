@@ -39,11 +39,7 @@ export function SelectFilter<T extends string = string>({
 
   return (
     <select
-      className={clsx(
-        "select select-bordered",
-        size === "sm" && "select-sm",
-        className
-      )}
+      className={clsx("select select-bordered", size === "sm" && "select-sm", className)}
       value={value}
       onChange={handleChange}
     >

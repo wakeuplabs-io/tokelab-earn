@@ -22,17 +22,12 @@ export interface StatusBadgeProps extends React.HTMLAttributes<HTMLSpanElement> 
   label: string;
 }
 
-export function StatusBadge({
-  className,
-  dotColor,
-  label,
-  ...props
-}: StatusBadgeProps) {
+export function StatusBadge({ className, dotColor, label, ...props }: StatusBadgeProps) {
   return (
     <span
       className={clsx(
         "inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium border-2 border-base-300 bg-white text-base-content",
-        className
+        className,
       )}
       {...props}
     >

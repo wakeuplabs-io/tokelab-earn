@@ -103,10 +103,7 @@ export function DataTable<T>({
               <tbody>
                 {data.length === 0 ? (
                   <tr>
-                    <td
-                      colSpan={columns.length}
-                      className="text-center py-8 text-base-content/60"
-                    >
+                    <td colSpan={columns.length} className="text-center py-8 text-base-content/60">
                       {emptyMessage}
                     </td>
                   </tr>
@@ -161,7 +158,7 @@ export function DataTable<T>({
                   >
                     {p}
                   </button>
-                )
+                ),
               )}
               <Button
                 variant="ghost"
@@ -184,10 +181,7 @@ export function DataTable<T>({
 /**
  * Generate page numbers for pagination
  */
-function generatePageNumbers(
-  currentPage: number,
-  totalPages: number
-): (number | string)[] {
+function generatePageNumbers(currentPage: number, totalPages: number): (number | string)[] {
   if (totalPages <= 7) {
     return Array.from({ length: totalPages }, (_, i) => i + 1);
   }

@@ -55,7 +55,7 @@ export function usePagination(options: UsePaginationOptions = {}): UsePagination
     (data: { pagination?: Pagination } | undefined): Pagination => {
       return data?.pagination ?? { ...DEFAULT_PAGINATION, limit };
     },
-    [limit]
+    [limit],
   );
 
   return {

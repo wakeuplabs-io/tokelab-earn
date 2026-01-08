@@ -1127,7 +1127,7 @@ async function main() {
   console.log("  ✓ Cleaned all tables\n");
 
   // Seed in order of dependencies
-  const blockchains = await seedBlockchains();
+  await seedBlockchains();
   const users = await seedUsers();
   await seedUserBalances(users);
   await seedUserDepositAddresses(users);
