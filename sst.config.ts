@@ -24,10 +24,17 @@ export default $config({
     };
   },
   async run() {
+    console.log("🚀 [SST] Starting run() function");
+    console.log("📋 [SST] Stage:", $app.stage);
+    console.log("📋 [SST] App name:", $app.name);
+    
     // load environment variables
+    console.log("🔧 [SST] Loading environment variables...");
     const dotenv = await import("dotenv");
     dotenv.config();
+    console.log("✅ [SST] Environment variables loaded");
 
+    console.log("🌐 [SST] Calculating domain URLs...");
     const stageSuffix =
       $app.stage === "production" ? "" : $app.stage === "staging" ? "-staging" : "-dev";
     const UI_DOMAIN_URL = `${PROJECT_NAME}${stageSuffix}`;
@@ -38,6 +45,7 @@ export default $config({
 
     const ASSETS_DOMAIN_URL = `assets.${UI_DOMAIN_URL}`;
     const ASSETS_URL = `https://${ASSETS_DOMAIN_URL}`;
+    console.log("✅ [SST] Domain URLs calculated:", { UI_URL, API_URL, ASSETS_URL });
 
     const allowedOrigins = [
       UI_URL,
@@ -53,6 +61,7 @@ export default $config({
     console.log("allowedOrigins", allowedOrigins);
     // --> Assets bucket and cloudfront distribution
 
+    console.log("📦 [SST] Creating assets bucket...");
     const assetsBucket = new sst.aws.Bucket("assets", {
       access: "public",
       cors: {
@@ -61,8 +70,10 @@ export default $config({
         allowHeaders: ["*"],
       },
     });
+    console.log("✅ [SST] Assets bucket created:", assetsBucket.name);
 
     //SST Router wouldn't create cloudfront, so using this instead
+    console.log("🌐 [SST] Creating assets CDN...");
     new sst.aws.Cdn("assets-cdn", {
       domain: ASSETS_DOMAIN_URL,
       origins: [
@@ -84,10 +95,11 @@ export default $config({
         },
       },
     });
+    console.log("✅ [SST] Assets CDN created");
 
     // <-- Assets bucket and cloudfront distribution
 
-
+    console.log("🔧 [SST] Preparing API environment variables...");
     const apiEnv = {
       API_URL: API_URL,
       ASSETS_URL: ASSETS_URL,
@@ -103,9 +115,10 @@ export default $config({
       AUTH0_AUDIENCE: process.env.AUTH0_AUDIENCE,
       NODE_ENV: $app.stage,
     };
-    
+    console.log("✅ [SST] API environment variables prepared");
+    console.log("📝 [SST] API env keys:", Object.keys(apiEnv).join(", "));
 
-
+    console.log("⚡ [SST] Creating API function...");
     const apiFunction = new sst.aws.Function("api", {
       handler: "packages/api/src/index.handler",
       environment: {
@@ -133,8 +146,10 @@ export default $config({
         },
       ],
     });
+    console.log("✅ [SST] API function created:", apiFunction.arn);
 
     // deploy API Gateway with custom domain
+    console.log("🚪 [SST] Creating API Gateway...");
     const api = new sst.aws.ApiGatewayV2("gateway", {
       domain: API_DOMAIN_URL,
       cors: {
@@ -145,11 +160,13 @@ export default $config({
     });
 
     // Add routes to connect API Gateway to the function
+    console.log("🛣️  [SST] Adding API routes...");
     api.route("ANY /{proxy+}", apiFunction.arn);
     api.route("ANY /", apiFunction.arn);
+    console.log("✅ [SST] API routes added");
     // <-- API deployment
 
-   
+    console.log("🎨 [SST] Preparing UI environment variables...");
     // Prepare UI environment
     const uiEnv = {
       VITE_API_URL: API_URL,
@@ -158,11 +175,16 @@ export default $config({
       VITE_AUTH0_CLIENT_ID: process.env.AUTH0_CLIENT_ID!,
       NODE_ENV: $app.stage,
     };
+    console.log("✅ [SST] UI environment variables prepared");
+    console.log("📝 [SST] UI env keys:", Object.keys(uiEnv).join(", "));
 
     // --> UI deployment
+    console.log("🌐 [SST] Processing UI domain configuration...");
     const domainRoot = UI_DOMAIN_URL.replace(/^https?:\/\/(www\.)?/, "");
     const domainAlias = UI_DOMAIN_URL.replace(/^https?:\/\//, "");
+    console.log("📋 [SST] Domain root:", domainRoot, "Domain alias:", domainAlias);
 
+    console.log("🎨 [SST] Creating UI StaticSite...");
     const ui = new sst.aws.StaticSite("ui", {
       build: {
         command: "npm run build:ui",
@@ -209,14 +231,19 @@ export default $config({
         },
       },
     });
+    console.log("✅ [SST] UI StaticSite created");
 
     // <-- UI deployment
 
-    return {
+    console.log("📤 [SST] Preparing return values...");
+    const returnValues = {
       ui: ui.url,
       api: api.url,
       assetsUrl: ASSETS_URL,
       assetsBucketName: assetsBucket.name,
     };
+    console.log("✅ [SST] Return values prepared:", returnValues);
+    console.log("🎉 [SST] run() function completed successfully");
+    return returnValues;
   },
 });
