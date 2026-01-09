@@ -11,11 +11,11 @@
  */
 
 import createApp from "./lib/create-app";
-import { getEnv } from "./config/env";
 import { cors } from "hono/cors";
 
 // Routes
 import vaultRoutes from "./routes/vault.routes";
+import investmentRoutes from "./routes/investment.routes";
 import webhookRoutes from "./routes/webhooks.routes";
 import adminInvestmentRoutes from "./routes/admin/investment.routes";
 
@@ -27,13 +27,15 @@ const app = createApp();
 /**
  * CORS middleware configuration
  */
-const env = getEnv();
 app.use(
   "/*",
   cors({
-    //origin: env.CORS_ORIGINS.split(",").map((origin) => origin.trim()),
-    origin: "*",
+    origin: ["http://localhost:3000", "http://localhost:5173"],
+    allowMethods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowHeaders: ["Content-Type", "Authorization"],
+    exposeHeaders: ["Content-Length"],
     credentials: true,
+    maxAge: 600,
   }),
 );
 
@@ -41,7 +43,9 @@ app.use(
  * API Routes
  *
  * User endpoints (require authentication):
- * POST   /api/vault        - Create user vault
+ * POST   /api/vault              - Create user vault
+ * GET    /api/investments        - List user's investments
+ * GET    /api/investments/summary - Get total available to claim
  *
  * Admin endpoints (require authentication + admin role):
  * GET    /api/admin/investments - List all investments
@@ -50,6 +54,7 @@ app.use(
  * POST   /api/webhooks/fireblocks - Fireblocks webhook handler
  */
 app.route("/api/vault", vaultRoutes);
+app.route("/api/investments", investmentRoutes);
 app.route("/api/admin/investments", adminInvestmentRoutes);
 app.route("/api/webhooks", webhookRoutes);
 

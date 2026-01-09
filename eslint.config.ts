@@ -37,6 +37,10 @@ export default tseslint.config(
         ...globals.node,
         ...globals.es2021,
       },
+      parserOptions: {
+        projectService: true,
+        tsconfigRootDir: import.meta.dirname,
+      },
     },
     settings: {
       react: {

@@ -1,50 +1,44 @@
 /**
- * Investment History Page
- * Admin page for viewing all investments with filters and pagination
+ * My Investments Page
+ * User page for viewing their own investments with filters and pagination
  */
 
 import { useState } from "react";
-import { useInvestments } from "../../hooks/api/useInvestments";
+import { HiOutlineInformationCircle } from "react-icons/hi";
+import { useUserInvestments, useUserInvestmentsSummary } from "../../hooks/api/useUserInvestments";
 import { usePagination } from "../../hooks/utils";
 import { SearchInput } from "../../components/ui/search-input";
 import { SelectFilter } from "../../components/ui/select-filter";
 import { DataTable, type DataTableColumn } from "../../components/ui/data-table";
 import { StatusBadge } from "../../components/ui/status-badge";
 import { DateRangeFilter, type DateRange } from "../../components/ui/date-range-filter";
+import { Button } from "../../components/ui/button";
 import {
   formatDate,
   formatNumber,
   getInvestmentStatusConfig,
   getModelTypeLabel,
 } from "../../lib/format";
-import type {
-  InvestmentStatus,
-  InvestmentModelType,
-  Investment,
-} from "../../domain/entities/investment";
+import type { InvestmentStatus, InvestmentModelType } from "../../domain/entities/investment";
+import type { UserInvestment } from "../../domain/entities/user-investment";
 
-export function InvestmentHistoryPage() {
-  const [search, setSearch] = useState("");
+export function MyInvestmentsPage() {
   const [status, setStatus] = useState<InvestmentStatus | "">("");
   const [modelType, setModelType] = useState<InvestmentModelType | "">("");
   const [dateRange, setDateRange] = useState<DateRange>({ from: null, to: null });
 
   const { page, limit, setPage, resetPage, getPagination } = usePagination({ limit: 10 });
 
-  const handleSearch = (value: string) => {
-    setSearch(value);
-    resetPage();
-  };
-
-  const { data, isLoading, error, refetch } = useInvestments({
+  const { data, isLoading, error, refetch } = useUserInvestments({
     page,
     limit,
-    search: search || undefined,
     status: status || undefined,
     modelType: modelType || undefined,
     dateFrom: dateRange.from || undefined,
     dateTo: dateRange.to || undefined,
   });
+
+  const { data: summary } = useUserInvestmentsSummary();
 
   const handleDateRangeChange = (range: DateRange) => {
     setDateRange(range);
@@ -64,12 +58,7 @@ export function InvestmentHistoryPage() {
   const investments = data?.data ?? [];
   const pagination = getPagination(data);
 
-  const columns: DataTableColumn<Investment>[] = [
-    {
-      key: "userEmail",
-      header: "Usuario",
-      render: (inv) => inv.userEmail,
-    },
+  const columns: DataTableColumn<UserInvestment>[] = [
     {
       key: "status",
       header: "Estado",
@@ -89,14 +78,14 @@ export function InvestmentHistoryPage() {
       render: (inv) => formatDate(inv.startDate),
     },
     {
-      key: "endDate",
-      header: "Fin",
-      render: (inv) => formatDate(inv.endDate),
-    },
-    {
       key: "currentAPR",
       header: "APR/RM",
       render: (inv) => (inv.currentAPR ? `${inv.currentAPR}%` : "-"),
+    },
+    {
+      key: "endDate",
+      header: "Fin",
+      render: (inv) => formatDate(inv.endDate),
     },
     {
       key: "initialAmount",
@@ -127,6 +116,17 @@ export function InvestmentHistoryPage() {
       render: (inv) => inv.daysToCollect,
     },
     {
+      key: "totalClaimed",
+      header: (
+        <>
+          <span className="block">Total</span>
+          <span className="block">Reclamado</span>
+        </>
+      ),
+      align: "right",
+      render: (inv) => formatNumber(inv.totalClaimed),
+    },
+    {
       key: "availableToClaim",
       header: (
         <>
@@ -138,23 +138,42 @@ export function InvestmentHistoryPage() {
       render: (inv) => formatNumber(inv.availableToClaim),
     },
     {
-      key: "totalClaimed",
+      key: "claimStatus",
       header: (
         <>
-          <span className="block">Total</span>
-          <span className="block">Reclamado</span>
+          <span className="block">Estado de</span>
+          <span className="block">reclamo</span>
         </>
       ),
-      align: "right",
-      render: (inv) => formatNumber(inv.totalClaimed),
+      render: (inv) => inv.claimStatus,
+    },
+    {
+      key: "action",
+      header: "",
+      render: (inv) => {
+        const isDisabled = inv.status !== "ACTIVE";
+        return (
+          <button
+            disabled={isDisabled}
+            className={`px-4 py-1.5 text-xs font-medium rounded-lg border transition-colors ${
+              isDisabled
+                ? "border-base-300 text-base-300 cursor-not-allowed"
+                : "border-primary text-primary hover:bg-primary/10 cursor-pointer"
+            }`}
+          >
+            Cancelar
+          </button>
+        );
+      },
     },
   ];
 
   return (
     <div className="space-y-6">
+      {/* Header with Search and Filters */}
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div className="w-[280px]">
-          <SearchInput placeholder="Buscar..." onSearch={handleSearch} debounceDelay={500} />
+          <SearchInput placeholder="Buscar..." debounceDelay={500} />
         </div>
 
         <div className="flex items-center gap-3">
@@ -187,6 +206,29 @@ export function InvestmentHistoryPage() {
         </div>
       </div>
 
+      {/* Summary Card */}
+      <div className="bg-white rounded-2xl p-6 flex items-center justify-between">
+        <div>
+          <div className="flex items-center gap-2 text-sm text-base-content/70">
+            Disponible para Reclamar
+            <div
+              className="tooltip tooltip-right"
+              data-tip="Fondos disponibles para retirar o reinvertir. Incluye rendimientos disponibles y capital recuperado de inversiones finalizadas."
+            >
+              <HiOutlineInformationCircle className="w-4 h-4 cursor-help" />
+            </div>
+          </div>
+          <div className="text-2xl font-bold text-primary">
+            {summary ? formatNumber(summary.totalAvailableToClaim) : "0"}{" "}
+            {summary?.currency ?? "USDT"}
+          </div>
+        </div>
+        <Button variant="primary" size="sm">
+          Reclamar
+        </Button>
+      </div>
+
+      {/* Table */}
       <DataTable
         columns={columns}
         data={investments}

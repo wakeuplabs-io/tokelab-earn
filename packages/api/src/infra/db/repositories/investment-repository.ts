@@ -8,6 +8,7 @@ import {
   Investment,
   InvestmentWithRelations,
   ListInvestmentsFilters,
+  UserInvestmentsFilters,
 } from "../../../domain/entities/investment";
 import { getPrismaClient } from "../../../config/database";
 
@@ -87,6 +88,93 @@ export class InvestmentRepository {
     });
 
     return investments.map((inv) => this.toDomain(inv));
+  }
+
+  /**
+   * Find user's investments with pagination and filters
+   * Includes modelConfig and yields relations (no user since it's the authenticated user)
+   */
+  async findByUserIdPaginated(
+    userId: string,
+    skip: number,
+    take: number,
+    filters?: UserInvestmentsFilters,
+  ): Promise<InvestmentWithRelations[]> {
+    const where = this.buildUserWhereClause(userId, filters);
+
+    const investments = await this.prisma.investment.findMany({
+      skip,
+      take,
+      where,
+      include: {
+        user: {
+          select: { email: true },
+        },
+        modelConfig: {
+          select: {
+            type: true,
+            durationDays: true,
+            aprInitial: true,
+            aprFinal: true,
+            aprStepPct: true,
+            aprStepPeriodDays: true,
+            claimPeriodDays: true,
+          },
+        },
+        yields: {
+          select: {
+            amount: true,
+            status: true,
+            monthlyYieldId: true,
+          },
+        },
+      },
+      orderBy: { createdAt: "desc" },
+    });
+
+    return investments.map((inv) => this.toDomainWithRelations(inv));
+  }
+
+  /**
+   * Count user's investments with filters
+   */
+  async countByUserId(userId: string, filters?: UserInvestmentsFilters): Promise<number> {
+    const where = this.buildUserWhereClause(userId, filters);
+    return this.prisma.investment.count({ where });
+  }
+
+  /**
+   * Build Prisma where clause for user's investments
+   */
+  private buildUserWhereClause(
+    userId: string,
+    filters?: UserInvestmentsFilters,
+  ): Prisma.InvestmentWhereInput {
+    const where: Prisma.InvestmentWhereInput = {
+      userId, // Always filter by userId
+    };
+
+    if (filters?.status) {
+      where.status = filters.status;
+    }
+
+    if (filters?.modelType) {
+      where.modelConfig = {
+        type: filters.modelType,
+      };
+    }
+
+    if (filters?.dateFrom || filters?.dateTo) {
+      where.startDate = {};
+      if (filters.dateFrom) {
+        where.startDate.gte = filters.dateFrom;
+      }
+      if (filters.dateTo) {
+        where.startDate.lte = filters.dateTo;
+      }
+    }
+
+    return where;
   }
 
   /**
