@@ -39,6 +39,11 @@ const sidebarItems: SidebarItem[] = [
     icon: <HiOutlineCheck className="w-6 h-6" />,
   },
   {
+    label: "Mi historial",
+    path: "/my-investments",
+    icon: <HiOutlineDocumentReport className="w-6 h-6" />,
+  },
+  {
     label: "Historial de inversiones",
     path: "/investment-history",
     icon: <HiOutlineDocumentReport className="w-6 h-6" />,

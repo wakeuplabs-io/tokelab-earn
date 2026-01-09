@@ -47,3 +47,6 @@ packages/ui/cache
 packages/api/src/generated/
 
 /docs
+
+# Claude Code
+CLAUDE.md

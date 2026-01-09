@@ -31,7 +31,10 @@ import {
 /**
  * Transform investment with relations to User DTO
  */
-function toUserDTO(investment: InvestmentWithRelations, variableAPR: number | null): UserInvestmentDTO {
+function toUserDTO(
+  investment: InvestmentWithRelations,
+  variableAPR: number | null,
+): UserInvestmentDTO {
   return {
     id: investment.id,
     status: investment.status,

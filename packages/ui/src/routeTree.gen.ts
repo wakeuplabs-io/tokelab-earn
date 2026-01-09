@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as VaultIndexRouteImport } from './routes/vault/index'
+import { Route as MyInvestmentsIndexRouteImport } from './routes/my-investments/index'
 import { Route as InvestmentHistoryIndexRouteImport } from './routes/investment-history/index'
 import { Route as AdminIndexRouteImport } from './routes/admin/index'
 import { Route as AboutIndexRouteImport } from './routes/about/index'
@@ -23,6 +24,11 @@ const IndexRoute = IndexRouteImport.update({
 const VaultIndexRoute = VaultIndexRouteImport.update({
   id: '/vault/',
   path: '/vault/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MyInvestmentsIndexRoute = MyInvestmentsIndexRouteImport.update({
+  id: '/my-investments/',
+  path: '/my-investments/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const InvestmentHistoryIndexRoute = InvestmentHistoryIndexRouteImport.update({
@@ -46,6 +52,7 @@ export interface FileRoutesByFullPath {
   '/about': typeof AboutIndexRoute
   '/admin': typeof AdminIndexRoute
   '/investment-history': typeof InvestmentHistoryIndexRoute
+  '/my-investments': typeof MyInvestmentsIndexRoute
   '/vault': typeof VaultIndexRoute
 }
 export interface FileRoutesByTo {
@@ -53,6 +60,7 @@ export interface FileRoutesByTo {
   '/about': typeof AboutIndexRoute
   '/admin': typeof AdminIndexRoute
   '/investment-history': typeof InvestmentHistoryIndexRoute
+  '/my-investments': typeof MyInvestmentsIndexRoute
   '/vault': typeof VaultIndexRoute
 }
 export interface FileRoutesById {
@@ -61,19 +69,33 @@ export interface FileRoutesById {
   '/about/': typeof AboutIndexRoute
   '/admin/': typeof AdminIndexRoute
   '/investment-history/': typeof InvestmentHistoryIndexRoute
+  '/my-investments/': typeof MyInvestmentsIndexRoute
   '/vault/': typeof VaultIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/about' | '/admin' | '/investment-history' | '/vault'
+  fullPaths:
+    | '/'
+    | '/about'
+    | '/admin'
+    | '/investment-history'
+    | '/my-investments'
+    | '/vault'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/about' | '/admin' | '/investment-history' | '/vault'
+  to:
+    | '/'
+    | '/about'
+    | '/admin'
+    | '/investment-history'
+    | '/my-investments'
+    | '/vault'
   id:
     | '__root__'
     | '/'
     | '/about/'
     | '/admin/'
     | '/investment-history/'
+    | '/my-investments/'
     | '/vault/'
   fileRoutesById: FileRoutesById
 }
@@ -82,6 +104,7 @@ export interface RootRouteChildren {
   AboutIndexRoute: typeof AboutIndexRoute
   AdminIndexRoute: typeof AdminIndexRoute
   InvestmentHistoryIndexRoute: typeof InvestmentHistoryIndexRoute
+  MyInvestmentsIndexRoute: typeof MyInvestmentsIndexRoute
   VaultIndexRoute: typeof VaultIndexRoute
 }
 
@@ -99,6 +122,13 @@ declare module '@tanstack/react-router' {
       path: '/vault'
       fullPath: '/vault'
       preLoaderRoute: typeof VaultIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/my-investments/': {
+      id: '/my-investments/'
+      path: '/my-investments'
+      fullPath: '/my-investments'
+      preLoaderRoute: typeof MyInvestmentsIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/investment-history/': {
@@ -130,6 +160,7 @@ const rootRouteChildren: RootRouteChildren = {
   AboutIndexRoute: AboutIndexRoute,
   AdminIndexRoute: AdminIndexRoute,
   InvestmentHistoryIndexRoute: InvestmentHistoryIndexRoute,
+  MyInvestmentsIndexRoute: MyInvestmentsIndexRoute,
   VaultIndexRoute: VaultIndexRoute,
 }
 export const routeTree = rootRouteImport

@@ -4,6 +4,13 @@
 
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
+import type { DotColor } from "../components/ui/status-badge";
+import type { InvestmentModelType, InvestmentStatus } from "../domain/entities/investment";
+
+export interface StatusBadgeConfig {
+  label: string;
+  dotColor: DotColor;
+}
 
 /**
  * Format date to DD/MM/YYYY
@@ -30,4 +37,23 @@ export function formatNumber(value: string | number): string {
 export function formatDisplayDate(dateStr: string): string {
   const date = new Date(dateStr);
   return format(date, "d MMM, yyyy", { locale: es });
+}
+
+/**
+ * Get status badge config for investment status
+ */
+export function getInvestmentStatusConfig(status: InvestmentStatus): StatusBadgeConfig {
+  const statusMap: Record<InvestmentStatus, StatusBadgeConfig> = {
+    ACTIVE: { label: "Activo", dotColor: "success" },
+    COMPLETED: { label: "Finalizado", dotColor: "neutral" },
+    CANCELLED: { label: "Cancelado", dotColor: "error" },
+  };
+  return statusMap[status];
+}
+
+/**
+ * Get label for investment model type
+ */
+export function getModelTypeLabel(modelType: InvestmentModelType): string {
+  return modelType === "FIXED" ? "Fijo" : "Variable";
 }
