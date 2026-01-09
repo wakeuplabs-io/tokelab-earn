@@ -11,7 +11,6 @@
  */
 
 import createApp from "./lib/create-app";
-import { getEnv } from "./config/env";
 import { cors } from "hono/cors";
 
 // Routes
@@ -28,7 +27,6 @@ const app = createApp();
 /**
  * CORS middleware configuration
  */
-const env = getEnv();
 app.use(
   "/*",
   cors({
