@@ -30,9 +30,12 @@ const app = createApp();
 app.use(
   "/*",
   cors({
-    //origin: env.CORS_ORIGINS.split(",").map((origin) => origin.trim()),
-    origin: "*",
+    origin: ["http://localhost:3000", "http://localhost:5173"],
+    allowMethods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowHeaders: ["Content-Type", "Authorization"],
+    exposeHeaders: ["Content-Length"],
     credentials: true,
+    maxAge: 600,
   }),
 );
 
