@@ -149,10 +149,7 @@ export async function getUserInvestmentsSummaryHandler(c: Context) {
   const investmentRepository = new InvestmentRepository();
 
   // Execute use case
-  const result = await getUserInvestmentsSummary(
-    { userId },
-    { investmentRepository },
-  );
+  const result = await getUserInvestmentsSummary({ userId }, { investmentRepository });
 
   return c.json(result, 200);
 }

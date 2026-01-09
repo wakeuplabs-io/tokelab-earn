@@ -25,10 +25,7 @@ export const userInvestmentService = {
     if (params.dateTo) searchParams.set("dateTo", params.dateTo);
 
     const query = searchParams.toString();
-    return apiGet<GetUserInvestmentsResponse>(
-      `/api/investments${query ? `?${query}` : ""}`,
-      token,
-    );
+    return apiGet<GetUserInvestmentsResponse>(`/api/investments${query ? `?${query}` : ""}`, token);
   },
 
   /**

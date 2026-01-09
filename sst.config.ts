@@ -28,7 +28,7 @@ export default $config({
     console.log("🚀 [SST] Starting run() function");
     console.log("📋 [SST] Stage:", $app.stage);
     console.log("📋 [SST] App name:", $app.name);
-    
+
     // load environment variables
     console.log("🔧 [SST] Loading environment variables...");
     const dotenv = await import("dotenv");
