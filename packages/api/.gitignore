@@ -31,6 +31,3 @@ lerna-debug.log*
 
 # misc
 .DS_Store
-
-# Prisma generated client (regenerate with: prisma generate)
-src/generated/
